@@ -1,22 +1,9 @@
 import Listing from "../models/Listing.js";
-import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
 
-const geocodingClient = mbxGeocoding({
-  accessToken: process.env.MAP_TOKEN,
-});
-
-
+// 1. Get All Listings
 export const getAllListings = async (req, res) => {
   try {
-    const { category } = req.query;
-
-    const filter = {};
-
-    if (category) {
-      filter.category = category;
-    }
-
-    const listings = await Listing.find(filter)
+    const listings = await Listing.find({})
       .populate("owner", "username email")
       .sort({ createdAt: -1 });
 
@@ -33,19 +20,12 @@ export const getAllListings = async (req, res) => {
   }
 };
 
-
+// 2. Get Single Listing by ID
 export const getListingById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const listing = await Listing.findById(id)
-      .populate({
-        path: "reviews",
-        populate: {
-          path: "author",
-          select: "username",
-        },
-      })
       .populate("owner", "username email");
 
     if (!listing) {
@@ -67,24 +47,10 @@ export const getListingById = async (req, res) => {
   }
 };
 
-
+// 3. Create New Listing
 export const createListing = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      price,
-      location,
-      country,
-      category,
-    } = req.body;
-
-    const geoData = await geocodingClient
-      .forwardGeocode({
-        query: location,
-        limit: 1,
-      })
-      .send();
+    const { title, description, price, location, country } = req.body;
 
     const listing = new Listing({
       title,
@@ -92,9 +58,7 @@ export const createListing = async (req, res) => {
       price,
       location,
       country,
-      category,
       owner: req.user._id,
-      geometry: geoData.body.features[0].geometry,
     });
 
     if (req.file) {
@@ -119,7 +83,7 @@ export const createListing = async (req, res) => {
   }
 };
 
-
+// 4. Update Listing
 export const updateListing = async (req, res) => {
   try {
     const { id } = req.params;
@@ -133,32 +97,13 @@ export const updateListing = async (req, res) => {
       });
     }
 
-    const {
-      title,
-      description,
-      price,
-      location,
-      country,
-      category,
-    } = req.body;
+    const { title, description, price, location, country } = req.body;
 
-    listing.title = title;
-    listing.description = description;
-    listing.price = price;
-    listing.location = location;
-    listing.country = country;
-    listing.category = category;
-
-    if (location) {
-      const geoData = await geocodingClient
-        .forwardGeocode({
-          query: location,
-          limit: 1,
-        })
-        .send();
-
-      listing.geometry = geoData.body.features[0].geometry;
-    }
+    listing.title = title || listing.title;
+    listing.description = description || listing.description;
+    listing.price = price || listing.price;
+    listing.location = location || listing.location;
+    listing.country = country || listing.country;
 
     if (req.file) {
       listing.image = {
@@ -182,7 +127,7 @@ export const updateListing = async (req, res) => {
   }
 };
 
-
+// 5. Delete Listing
 export const deleteListing = async (req, res) => {
   try {
     const { id } = req.params;
