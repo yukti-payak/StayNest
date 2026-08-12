@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Compass, Search, Menu, X } from "lucide-react";
 
 const Navbar = () => {
@@ -9,14 +10,14 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Brand Logo & Name */}
-        <div className="flex items-center space-x-2 shrink-0 cursor-pointer text-rose-500">
+        <Link to="/" className="flex items-center space-x-2 shrink-0 cursor-pointer text-rose-500">
           <div className="bg-rose-500 text-white p-1.5 sm:p-2 rounded-full flex items-center justify-center shadow-sm">
             <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <span className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight hidden sm:inline">
             Explore
           </span>
-        </div>
+        </Link>
 
         {/* Center Search Bar */}
         <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
@@ -35,9 +36,9 @@ const Navbar = () => {
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-700 shrink-0">
-          <button className="hover:text-rose-500 transition cursor-pointer">
+          <Link to="/listings/new" className="hover:text-rose-500 transition cursor-pointer">
             Add new listing
-          </button>
+          </Link>
           <button className="hover:text-rose-500 transition cursor-pointer">
             Sign Up
           </button>
@@ -60,9 +61,13 @@ const Navbar = () => {
       {/* Mobile Dropdown Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 pt-2 pb-4 space-y-3 shadow-lg">
-          <button className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition">
+          <Link
+            to="/listings/new"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+          >
             Add new listing
-          </button>
+          </Link>
           <button className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition">
             Sign Up
           </button>

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import ShowListing from "./pages/ShowListing";
 import Footer from "./components/Footer";
+import NewListing from "./pages/NewListing.jsx"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/listings/:id" element={<ShowListing />} />
+          <Route path="/listings/new" element={<NewListing />} />
         </Routes>
       </div>
 
