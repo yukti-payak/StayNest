@@ -1,5 +1,5 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 // 1. Configure Cloudinary with your .env variables
 cloudinary.config({
@@ -17,7 +17,5 @@ const storage = new CloudinaryStorage({
   },
 });
 
-module.exports = {
-  cloudinary,
-  storage,
-};
+// 3. Export using ES Module syntax
+export { cloudinary, storage };

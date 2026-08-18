@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { storage } from "../cloudConfig.js"; // Adjust path if cloudConfig.js is located elsewhere
+import { storage } from "../config/cloudConfig.js";
 
 import {
   getAllListings,
