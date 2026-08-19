@@ -50,6 +50,14 @@ export const getListingById = async (req, res) => {
 // 3. Create New Listing
 export const createListing = async (req, res) => {
   try {
+    // Prevent reading '_id' off undefined if auth middleware was skipped
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Please log in to create a listing",
+      });
+    }
+
     const { title, description, price, location, country } = req.body;
 
     const listing = new Listing({
