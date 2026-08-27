@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import ShowListing from "./pages/ShowListing";
 import Footer from "./components/Footer";
 import NewListing from "./pages/NewListing.jsx"
+import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
 
 function App() {
   return (
@@ -14,6 +16,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/listings/:id" element={<ShowListing />} />
           <Route path="/listings/new" element={<NewListing />} />
+
+          {/* Auth Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
 

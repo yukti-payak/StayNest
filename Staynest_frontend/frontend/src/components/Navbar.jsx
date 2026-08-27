@@ -68,12 +68,12 @@ const Navbar = () => {
           >
             Add new listing
           </Link>
-          <button className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition">
-            Sign Up
-          </button>
-          <button className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition">
-            Log in
-          </button>
+         <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
+  Sign Up
+</Link>
+<Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
+  Log in
+</Link>
         </div>
       )}
     </header>
