@@ -39,12 +39,13 @@ const Navbar = () => {
           <Link to="/listings/new" className="hover:text-rose-500 transition cursor-pointer">
             Add new listing
           </Link>
-          <button className="hover:text-rose-500 transition cursor-pointer">
+          {/* Changed <button> to <Link> */}
+          <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
             Sign Up
-          </button>
-          <button className="hover:text-rose-500 transition cursor-pointer">
+          </Link>
+          <Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
             Log in
-          </button>
+          </Link>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -68,12 +69,20 @@ const Navbar = () => {
           >
             Add new listing
           </Link>
-         <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
-  Sign Up
-</Link>
-<Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
-  Log in
-</Link>
+          <Link
+            to="/signup"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+          >
+            Sign Up
+          </Link>
+          <Link
+            to="/login"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+          >
+            Log in
+          </Link>
         </div>
       )}
     </header>
