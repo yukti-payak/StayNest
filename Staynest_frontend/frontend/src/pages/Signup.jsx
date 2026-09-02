@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 const Signup = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "", // Changed from username to name
+    name: "",
     email: "",
     password: "",
   });
@@ -28,11 +27,8 @@ const Signup = () => {
     try {
       const res = await API.post("/auth/register", formData);
 
-      if (res.data?.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-      if (res.data?.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+      if (res.data) {
+        localStorage.setItem("user", JSON.stringify(res.data));
       }
 
       navigate("/");
@@ -67,7 +63,7 @@ const Signup = () => {
                 Full Name
               </label>
               <input
-                name="name" // Matches backend schema field name
+                name="name"
                 type="text"
                 required
                 placeholder="Yukti"
@@ -124,8 +120,6 @@ const Signup = () => {
           </p>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../api/axios"; // Your pre-configured Axios instance
+import API from "../api/axios";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,15 +25,11 @@ const Login = () => {
     try {
       const res = await API.post("/auth/login", formData);
 
-      // Save token & user details to localStorage (if using JWT tokens)
-      if (res.data?.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-      if (res.data?.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+      // Save non-sensitive user details locally if needed (Cookie handles authentication)
+      if (res.data) {
+        localStorage.setItem("user", JSON.stringify(res.data));
       }
 
-      // Redirect user to home/listings page upon success
       navigate("/");
     } catch (err) {
       setError(
@@ -91,7 +87,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-xl text-sm transition shadow-sm disabled:opacity-50"
+            className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-xl text-sm transition shadow-sm disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>

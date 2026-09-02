@@ -1,9 +1,30 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Compass, Search, Menu, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Compass, Search, Menu, X, LogOut } from "lucide-react";
+import API from "../api/axios";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Retrieve user data from localStorage to toggle auth state
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = async () => {
+    try {
+      // 1. Call backend to clear the HttpOnly JWT cookie
+      await API.post("/auth/logout");
+
+      // 2. Remove user data from localStorage
+      localStorage.removeItem("user");
+
+      // 3. Close mobile menu if open & redirect to login page
+      setIsMobileMenuOpen(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -39,13 +60,30 @@ const Navbar = () => {
           <Link to="/listings/new" className="hover:text-rose-500 transition cursor-pointer">
             Add new listing
           </Link>
-          {/* Changed <button> to <Link> */}
-          <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
-            Sign Up
-          </Link>
-          <Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
-            Log in
-          </Link>
+
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-900 font-semibold">
+                Hi, {user.name}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white px-3.5 py-1.5 rounded-lg transition text-sm cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
+                Sign Up
+              </Link>
+              <Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
+                Log in
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -69,20 +107,38 @@ const Navbar = () => {
           >
             Add new listing
           </Link>
-          <Link
-            to="/signup"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
-          >
-            Sign Up
-          </Link>
-          <Link
-            to="/login"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
-          >
-            Log in
-          </Link>
+
+          {user ? (
+            <>
+              <div className="py-1 text-sm font-semibold text-gray-900">
+                Hi, {user.name}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 w-full text-left py-2 text-sm font-medium text-rose-500 hover:text-rose-600 transition cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/signup"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+              >
+                Sign Up
+              </Link>
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+              >
+                Log in
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
