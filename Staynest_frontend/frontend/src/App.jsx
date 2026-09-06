@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import NewListing from "./pages/NewListing.jsx"
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
+import EditListing from './pages/EditListing.jsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/listings/:id" element={<ShowListing />} />
           <Route path="/listings/new" element={<NewListing />} />
+          <Route path="/listings/:id/edit" element={<EditListing />} />
 
           {/* Auth Routes */}
         <Route path="/login" element={<Login />} />

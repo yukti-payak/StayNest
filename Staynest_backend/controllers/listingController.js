@@ -4,7 +4,7 @@ import Listing from "../models/Listing.js";
 export const getAllListings = async (req, res) => {
   try {
     const listings = await Listing.find({})
-      .populate("owner", "username email")
+      .populate("owner", "name email")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -26,7 +26,14 @@ export const getListingById = async (req, res) => {
     const { id } = req.params;
 
     const listing = await Listing.findById(id)
-      .populate("owner", "username email");
+      .populate("owner", "name email")
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "author",
+          select: "name",
+        },
+      });
 
     if (!listing) {
       return res.status(404).json({
@@ -50,7 +57,6 @@ export const getListingById = async (req, res) => {
 // 3. Create New Listing
 export const createListing = async (req, res) => {
   try {
-    // Prevent reading '_id' off undefined if auth middleware was skipped
     if (!req.user) {
       return res.status(401).json({
         success: false,
@@ -58,7 +64,9 @@ export const createListing = async (req, res) => {
       });
     }
 
-    const { title, description, price, location, country } = req.body;
+    // Handles both flat (req.body) and nested (req.body.listing) formats
+    const bodyData = req.body.listing || req.body;
+    const { title, description, price, location, country } = bodyData;
 
     const listing = new Listing({
       title,
@@ -84,7 +92,7 @@ export const createListing = async (req, res) => {
       data: listing,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -105,7 +113,8 @@ export const updateListing = async (req, res) => {
       });
     }
 
-    const { title, description, price, location, country } = req.body;
+    const bodyData = req.body.listing || req.body;
+    const { title, description, price, location, country } = bodyData;
 
     listing.title = title || listing.title;
     listing.description = description || listing.description;
@@ -128,7 +137,7 @@ export const updateListing = async (req, res) => {
       data: listing,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });

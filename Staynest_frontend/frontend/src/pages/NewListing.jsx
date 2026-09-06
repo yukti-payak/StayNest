@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 const NewListing = () => {
   const navigate = useNavigate();
@@ -20,12 +19,10 @@ const NewListing = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Handle Text Input Changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle File Upload & Preview Generation
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -34,13 +31,11 @@ const NewListing = () => {
     }
   };
 
-  // Remove Selected Image
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
   };
 
-  // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -48,14 +43,14 @@ const NewListing = () => {
 
     try {
       const data = new FormData();
-      data.append("listing[title]", formData.title);
-      data.append("listing[description]", formData.description);
-      data.append("listing[price]", formData.price);
-      data.append("listing[country]", formData.country);
-      data.append("listing[location]", formData.location);
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("price", formData.price);
+      data.append("country", formData.country);
+      data.append("location", formData.location);
 
       if (imageFile) {
-        data.append("listing[image]", imageFile);
+        data.append("image", imageFile);
       }
 
       const res = await API.post("/listings", data, {
@@ -84,7 +79,6 @@ const NewListing = () => {
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 py-10 w-full">
-        {/* Header Section */}
         <div className="mb-8 text-center sm:text-left">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             Create a New Listing
@@ -94,11 +88,10 @@ const NewListing = () => {
           </p>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-center justify-between">
             <span>{error}</span>
-            <button 
+            <button
               type="button"
               onClick={() => setError(null)}
               className="text-red-500 hover:text-red-700 font-bold ml-4"
@@ -108,12 +101,10 @@ const NewListing = () => {
           </div>
         )}
 
-        {/* Form Container */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-10 shadow-xl shadow-gray-100/50 space-y-6"
         >
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700">
               Listing Title
@@ -129,7 +120,6 @@ const NewListing = () => {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700">
               Description
@@ -145,12 +135,11 @@ const NewListing = () => {
             ></textarea>
           </div>
 
-          {/* Image Upload Area */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700">
               Upload Cover Photo
             </label>
-            
+
             {!imagePreview ? (
               <label className="flex flex-col items-center justify-center w-full h-44 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer hover:border-rose-400 hover:bg-rose-50/30 transition group">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -175,7 +164,6 @@ const NewListing = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  required
                   onChange={handleFileChange}
                   className="hidden"
                 />
@@ -200,7 +188,6 @@ const NewListing = () => {
             )}
           </div>
 
-          {/* Grid Layout: Price & Country */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-medium mb-1.5 text-gray-700">
@@ -238,7 +225,6 @@ const NewListing = () => {
             </div>
           </div>
 
-          {/* Location */}
           <div>
             <label className="block text-sm font-medium mb-1.5 text-gray-700">
               Location / City
@@ -254,7 +240,6 @@ const NewListing = () => {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="pt-4 flex items-center justify-end space-x-3 border-t border-gray-100">
             <button
               type="button"
@@ -268,22 +253,11 @@ const NewListing = () => {
               disabled={loading}
               className="px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-xl text-sm transition shadow-md shadow-rose-200 disabled:opacity-50 flex items-center justify-center min-w-[140px]"
             >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Publishing...
-                </span>
-              ) : (
-                "Publish Listing"
-              )}
+              {loading ? "Publishing..." : "Publish Listing"}
             </button>
           </div>
         </form>
       </main>
-
     </div>
   );
 };
