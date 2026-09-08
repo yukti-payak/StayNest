@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'; // 1. Import cookie-parser
 import connectDB from "./config/db.js";
 import listingRoutes from "./routes/listingRoutes.js";
 import authRoutes from './routes/authRoutes.js';
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const PORT = 8080;
 const app = express();
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
+app.use("/api/listings/:id/reviews", reviewRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
