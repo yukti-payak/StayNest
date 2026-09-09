@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Edit, Trash2, User, Star } from "lucide-react";
+import { Edit, Trash2, User, Star, MapPin } from "lucide-react";
 
 const ShowListing = () => {
   const { id } = useParams();
@@ -16,6 +16,7 @@ const ShowListing = () => {
 
   // Review Form State
   const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState("");
@@ -75,14 +76,12 @@ const ShowListing = () => {
         comment,
       });
 
-      // Append new review to local state
       const addedReview = res.data.review;
       setListing((prev) => ({
         ...prev,
         reviews: [...(prev.reviews || []), addedReview],
       }));
 
-      // Reset form
       setComment("");
       setRating(5);
     } catch (err) {
@@ -104,8 +103,7 @@ const ShowListing = () => {
 
     try {
       await API.delete(`/listings/${id}/reviews/${reviewId}`);
-      
-      // Remove review from local state
+
       setListing((prev) => ({
         ...prev,
         reviews: prev.reviews.filter((rev) => rev._id !== reviewId),
@@ -117,13 +115,11 @@ const ShowListing = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
-        <div className="flex-1 max-w-6xl mx-auto px-4 py-20 flex flex-col items-center justify-center gap-4">
-          <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-500 font-medium text-sm">
-            Loading stay details...
-          </p>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm">Loading stay details…</p>
         </div>
         <Footer />
       </div>
@@ -132,13 +128,13 @@ const ShowListing = () => {
 
   if (error || !listing) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
-        <div className="flex-1 max-w-xl mx-auto my-16 p-8 text-center bg-white rounded-3xl border border-gray-100 shadow-sm h-fit">
-          <p className="text-rose-500 font-medium mb-4">{error}</p>
+        <div className="flex-1 max-w-md mx-auto my-24 px-6 text-center">
+          <p className="text-gray-700 font-medium mb-5">{error}</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 bg-rose-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-rose-600 transition shadow-md shadow-rose-200"
+            className="inline-block bg-rose-500 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-rose-600 transition"
           >
             Back to Explore
           </Link>
@@ -164,232 +160,219 @@ const ShowListing = () => {
       ? listing.owner?.name || listing.owner?.username || listing.owner?.email
       : null;
 
+  const reviewCount = listing.reviews?.length || 0;
+  const avgRating = reviewCount
+    ? (
+        listing.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
+        reviewCount
+      ).toFixed(1)
+    : null;
+
   return (
-    <div className="min-h-screen bg-gray-50/50 text-gray-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
-        <article className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-10 shadow-sm space-y-8">
-          
-          {/* Centered Page Title */}
-          <div className="text-center space-y-3 pb-2">
-            <h1 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight leading-tight max-w-2xl mx-auto">
+      <main className="flex-1 max-w-3xl mx-auto px-5 sm:px-6 py-10 w-full">
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 leading-snug">
               {listing.title}
             </h1>
-
-            {/* Owner Actions */}
-            {isOwner && (
-              <div className="flex items-center justify-center gap-2.5 pt-2">
-                <Link
-                  to={`/listings/${id}/edit`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition shadow-xs"
-                >
-                  <Edit className="w-4 h-4 text-gray-500" /> Edit
-                </Link>
-
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition shadow-sm shadow-rose-200 cursor-pointer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
+            {avgRating && (
+              <div className="flex items-center gap-1.5 mt-1.5 text-sm text-gray-500">
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <span className="font-medium text-gray-700">{avgRating}</span>
+                <span>
+                  · {reviewCount} review{reviewCount !== 1 ? "s" : ""}
+                </span>
               </div>
             )}
           </div>
 
-          {/* Hero Image */}
-          <div className="relative w-full h-[360px] sm:h-[480px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm group">
-            <img
-              src={imageUrl}
-              alt={listing.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          </div>
-
-          {/* Details Grid: Price & Host Info */}
-          <div className="flex flex-wrap items-center justify-between gap-6 p-6 rounded-2xl bg-gray-50 border border-gray-100">
-            {listing.price && (
-              <div className="space-y-1">
-                <p className="text-xs font-bold uppercase tracking-wider text-rose-600">
-                  Rate
-                </p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-                    &#8377;{Number(listing.price).toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-gray-500 font-medium text-base">/ night</span>
-                </div>
-              </div>
-            )}
-
-            {ownerName && (
-              <div className="flex items-center gap-3 bg-white px-4 py-3 rounded-xl border border-gray-100 shadow-xs">
-                <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-sm shrink-0">
-                  <User className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider font-bold text-gray-400">
-                    Hosted By
-                  </p>
-                  <p className="text-sm font-semibold text-gray-800">
-                    {ownerName}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Description Section */}
-          <div className="space-y-4 pt-2">
-            <h2 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-3">
-              About this stay
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg whitespace-pre-line font-normal">
-              {listing.description || "No description available for this stay."}
-            </p>
-          </div>
-
-          {/* Reviews Section */}
-          <div className="pt-8 border-t border-gray-100 space-y-8">
-            <h2 className="text-2xl font-bold text-gray-900">Reviews & Ratings</h2>
-
-            {/* Leave a Review Form (Authenticated Users Only) */}
-            {user ? (
-              <form onSubmit={handleReviewSubmit} className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4">
-                <h3 className="text-base font-bold text-gray-900">Leave a Review</h3>
-
-                {reviewError && (
-                  <p className="text-xs font-semibold text-rose-500">{reviewError}</p>
-                )}
-
-                {/* Rating Input */}
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Rating
-                  </label>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setRating(star)}
-                        className="p-1 focus:outline-none cursor-pointer"
-                      >
-                        <Star
-                          className={`w-6 h-6 ${
-                            star <= rating
-                              ? "text-amber-400 fill-amber-400"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Comment Input */}
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Comments
-                  </label>
-                  <textarea
-                    rows="3"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Share your experience staying here..."
-                    className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 resize-none"
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={submittingReview}
-                  className="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-semibold text-sm rounded-xl transition shadow-sm cursor-pointer"
-                >
-                  {submittingReview ? "Submitting..." : "Submit Review"}
-                </button>
-              </form>
-            ) : (
-              <div className="bg-gray-50 p-5 rounded-2xl text-center border border-gray-100">
-                <p className="text-sm text-gray-600">
-                  Please{" "}
-                  <Link to="/login" className="text-rose-500 font-semibold underline">
-                    Log in
-                  </Link>{" "}
-                  to leave a review.
-                </p>
-              </div>
-            )}
-
-            {/* Display Reviews List */}
-            <div className="space-y-4">
-              {listing.reviews && listing.reviews.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {listing.reviews.map((rev) => {
-                    const isReviewAuthor =
-                      user &&
-                      rev.author &&
-                      (user._id === rev.author._id || user._id === rev.author);
-
-                    const authorName =
-                      rev.author?.name || rev.author?.username || "Anonymous";
-
-                    return (
-                      <div
-                        key={rev._id}
-                        className="p-5 bg-white border border-gray-100 rounded-2xl shadow-xs space-y-3 flex flex-col justify-between"
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-bold text-gray-900">
-                              @{authorName}
-                            </span>
-                            <div className="flex items-center gap-0.5">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                  key={star}
-                                  className={`w-4 h-4 ${
-                                    star <= rev.rating
-                                      ? "text-amber-400 fill-amber-400"
-                                      : "text-gray-200"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-
-                          <p className="text-sm text-gray-600 leading-relaxed">
-                            {rev.comment}
-                          </p>
-                        </div>
-
-                        {/* Author-only Delete Button */}
-                        {isReviewAuthor && (
-                          <div className="pt-2 flex justify-end">
-                            <button
-                              onClick={() => handleDeleteReview(rev._id)}
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-rose-500 hover:text-rose-600 transition cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm italic">
-                  No reviews yet for this stay.
-                </p>
-              )}
+          {isOwner && (
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to={`/listings/${id}/edit`}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:border-gray-300 transition"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Edit</span>
+              </Link>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-rose-600 hover:text-rose-700 border border-rose-200 rounded-lg hover:border-rose-300 disabled:opacity-50 transition cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">
+                  {deleting ? "Deleting…" : "Delete"}
+                </span>
+              </button>
             </div>
-          </div>
+          )}
+        </div>
 
-        </article>
+        {/* Hero image */}
+        <div className="w-full h-[280px] sm:h-[420px] rounded-xl overflow-hidden bg-gray-100 mb-8">
+          <img
+            src={imageUrl}
+            alt={listing.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Price + host */}
+        <div className="flex items-center justify-between pb-8 mb-8 border-b border-gray-100">
+          {listing.price && (
+            <div>
+              <div className="text-2xl font-semibold text-gray-900">
+                &#8377;{Number(listing.price).toLocaleString("en-IN")}
+                <span className="text-base font-normal text-gray-400"> / night</span>
+              </div>
+            </div>
+          )}
+
+          {ownerName && (
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                <User className="w-4 h-4" />
+              </div>
+              <div className="text-sm">
+                <p className="text-gray-400 leading-tight">Hosted by</p>
+                <p className="font-medium text-gray-800 leading-tight">{ownerName}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="mb-10">
+          <h2 className="text-base font-semibold text-gray-900 mb-3">
+            About this stay
+          </h2>
+          <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+            {listing.description || "No description available for this stay."}
+          </p>
+        </div>
+
+        {/* Reviews */}
+        <div className="pt-8 border-t border-gray-100">
+          <h2 className="text-base font-semibold text-gray-900 mb-5">
+            {reviewCount > 0 ? `${reviewCount} Review${reviewCount !== 1 ? "s" : ""}` : "Reviews"}
+          </h2>
+
+          {/* Review form */}
+          {user ? (
+            <form onSubmit={handleReviewSubmit} className="mb-8">
+              {reviewError && (
+                <p className="text-sm text-rose-500 mb-3">{reviewError}</p>
+              )}
+
+              <div className="flex items-center gap-1 mb-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="p-0.5 cursor-pointer"
+                    aria-label={`Rate ${star} star${star !== 1 ? "s" : ""}`}
+                  >
+                    <Star
+                      className={`w-5 h-5 transition-colors ${
+                        star <= (hoverRating || rating)
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-gray-200"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <textarea
+                rows="3"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience staying here…"
+                className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500/15 focus:border-rose-400 resize-none transition"
+                required
+              />
+
+              <button
+                type="submit"
+                disabled={submittingReview}
+                className="mt-3 px-4 py-2 bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-medium text-sm rounded-lg transition cursor-pointer"
+              >
+                {submittingReview ? "Submitting…" : "Post review"}
+              </button>
+            </form>
+          ) : (
+            <p className="text-sm text-gray-500 mb-8">
+              <Link to="/login" className="text-rose-500 font-medium hover:underline">
+                Log in
+              </Link>{" "}
+              to leave a review.
+            </p>
+          )}
+
+          {/* Review list */}
+          {reviewCount > 0 ? (
+            <ul className="divide-y divide-gray-100">
+              {listing.reviews.map((rev) => {
+                const isReviewAuthor =
+                  user &&
+                  rev.author &&
+                  (user._id === rev.author._id || user._id === rev.author);
+
+                const authorName =
+                  rev.author?.name || rev.author?.username || "Anonymous";
+
+                return (
+                  <li key={rev._id} className="py-5 first:pt-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {authorName}
+                        </p>
+                        <div className="flex items-center gap-0.5 mt-1 mb-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-3.5 h-3.5 ${
+                                star <= rev.rating
+                                  ? "text-amber-400 fill-amber-400"
+                                  : "text-gray-200"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {rev.comment}
+                        </p>
+                      </div>
+
+                      {isReviewAuthor && (
+                        <button
+                          onClick={() => handleDeleteReview(rev._id)}
+                          className="text-gray-300 hover:text-rose-500 transition cursor-pointer shrink-0"
+                          aria-label="Delete review"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-gray-400 text-sm italic">
+              No reviews yet — be the first to share your experience.
+            </p>
+          )}
+        </div>
       </main>
     </div>
   );
