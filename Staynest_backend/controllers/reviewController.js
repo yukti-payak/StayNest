@@ -12,18 +12,21 @@ export const createReview = async (req, res) => {
       return res.status(404).json({ message: "Listing not found" });
     }
 
+    // 1. Save new review document
     const newReview = new Review({
       comment,
       rating,
       author: req.user._id, // Set from JWT auth middleware
     });
 
-    listing.reviews.push(newReview);
-
     await newReview.save();
-    await listing.save();
 
-    // Populate author info before returning response
+    // 2. Atomic push to listing's reviews array (bypasses full listing schema validation)
+    await Listing.findByIdAndUpdate(id, {
+      $push: { reviews: newReview._id },
+    });
+
+    // 3. Populate author info before returning response
     await newReview.populate("author", "name username email");
 
     res.status(201).json({
