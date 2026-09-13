@@ -6,14 +6,12 @@ import Footer from "../components/Footer";
 import {
   Edit,
   Trash2,
-  User,
   Star,
   MapPin,
   MessageSquare,
   AlertCircle,
   Share2,
   Heart,
-  Calendar,
   ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
@@ -404,7 +402,7 @@ const ShowListing = () => {
                 </div>
               )}
 
-              {/* Review Cards Grid (Side by Side layout) */}
+              {/* Review Cards Grid */}
               {reviewCount > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {listing.reviews.map((rev) => {
@@ -492,10 +490,10 @@ const ShowListing = () => {
             </div>
           </div>
 
-          {/* Right Column: Sticky Booking / Price Sidebar */}
+          {/* Right Column: Sticky Pricing Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-8 bg-white p-6 rounded-3xl border border-gray-200/90 shadow-xl shadow-slate-200/50 space-y-6">
-              <div className="flex items-baseline justify-between pb-4 border-b border-gray-100">
+            <div className="sticky top-8 bg-white p-6 rounded-3xl border border-gray-200/90 shadow-lg shadow-slate-200/40">
+              <div className="flex items-baseline justify-between">
                 <div>
                   <span className="text-3xl font-black text-gray-900">
                     &#8377;{Number(listing.price || 0).toLocaleString("en-IN")}
@@ -503,46 +501,11 @@ const ShowListing = () => {
                   <span className="text-sm text-gray-500 font-medium"> / night</span>
                 </div>
                 {avgRating && (
-                  <div className="flex items-center gap-1 text-sm font-bold text-gray-900">
+                  <div className="flex items-center gap-1 text-sm font-bold text-gray-900 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200/60">
                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                     <span>{avgRating}</span>
                   </div>
                 )}
-              </div>
-
-              {/* Mock Booking Date Selectors */}
-              <div className="border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-200">
-                <div className="grid grid-cols-2 divide-x divide-gray-200 bg-slate-50/50">
-                  <div className="p-3">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase">
-                      Check-In
-                    </label>
-                    <span className="text-xs font-semibold text-gray-700">Add date</span>
-                  </div>
-                  <div className="p-3">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase">
-                      Check-Out
-                    </label>
-                    <span className="text-xs font-semibold text-gray-700">Add date</span>
-                  </div>
-                </div>
-                <div className="p-3 bg-slate-50/50">
-                  <label className="block text-[10px] font-bold text-gray-400 uppercase">
-                    Guests
-                  </label>
-                  <span className="text-xs font-semibold text-gray-700">1 guest</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => alert("Booking functionality coming soon!")}
-                className="w-full py-3.5 bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white font-bold text-base rounded-2xl shadow-lg shadow-rose-500/25 transition-all cursor-pointer"
-              >
-                Reserve Stay
-              </button>
-
-              <div className="text-center">
-                <p className="text-xs text-gray-400">You won't be charged yet</p>
               </div>
             </div>
           </div>
