@@ -1,9 +1,24 @@
 import Listing from "../models/Listing.js";
+import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
 
-// 1. Get All Listings
+const mapToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+
+// 1. Get All Listings (with Category & Search Support)
 export const getAllListings = async (req, res) => {
   try {
-    const listings = await Listing.find({})
+    const { category, title } = req.query;
+    let filter = {};
+
+    if (category && category !== "All") {
+      filter.category = category;
+    }
+
+    if (title && title.trim() !== "") {
+      filter.title = { $regex: title.trim(),$options: "i" };
+    }
+
+    const listings = await Listing.find(filter)
       .populate("owner", "name email")
       .sort({ createdAt: -1 });
 
@@ -54,7 +69,7 @@ export const getListingById = async (req, res) => {
   }
 };
 
-// 3. Create New Listing
+// 3. Create New Listing (with Mapbox Geocoding)
 export const createListing = async (req, res) => {
   try {
     if (!req.user) {
@@ -64,9 +79,21 @@ export const createListing = async (req, res) => {
       });
     }
 
-    // Handles both flat (req.body) and nested (req.body.listing) formats
     const bodyData = req.body.listing || req.body;
-    const { title, description, price, location, country } = bodyData;
+    const { title, description, price, location, country, category } = bodyData;
+
+    // Fetch coordinates from Mapbox Geocoding API based on location string
+    const geoResponse = await geocodingClient
+      .forwardGeocode({
+        query: `${location}, ${country}`,
+        limit: 1,
+      })
+      .send();
+
+    const geometry = geoResponse.body.features[0]?.geometry || {
+      type: "Point",
+      coordinates: [0, 0],
+    };
 
     const listing = new Listing({
       title,
@@ -74,6 +101,8 @@ export const createListing = async (req, res) => {
       price,
       location,
       country,
+      category,
+      geometry,
       owner: req.user._id,
     });
 
@@ -99,7 +128,7 @@ export const createListing = async (req, res) => {
   }
 };
 
-// 4. Update Listing
+// 4. Update Listing (with Mapbox Geocoding on location update)
 export const updateListing = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,13 +143,31 @@ export const updateListing = async (req, res) => {
     }
 
     const bodyData = req.body.listing || req.body;
-    const { title, description, price, location, country } = bodyData;
+    const { title, description, price, location, country, category } = bodyData;
+
+    // Re-geocode coordinates if location/country changed
+    if (
+      (location && location !== listing.location) ||
+      (country && country !== listing.country)
+    ) {
+      const geoResponse = await geocodingClient
+        .forwardGeocode({
+          query: `${location || listing.location}, ${country || listing.country}`,
+          limit: 1,
+        })
+        .send();
+
+      if (geoResponse.body.features[0]?.geometry) {
+        listing.geometry = geoResponse.body.features[0].geometry;
+      }
+    }
 
     listing.title = title || listing.title;
     listing.description = description || listing.description;
     listing.price = price || listing.price;
     listing.location = location || listing.location;
     listing.country = country || listing.country;
+    listing.category = category || listing.category;
 
     if (req.file) {
       listing.image = {
