@@ -1,5 +1,6 @@
 import Listing from "../models/Listing.js";
 import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+import redis from "../config/redis.js";
 
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
@@ -8,6 +9,23 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 export const getAllListings = async (req, res) => {
   try {
     const { category, title } = req.query;
+
+    // 1. Generate a dynamic cache key based on query filters
+    const categoryKey = category || "all";
+    const titleKey = title ? title.trim().toLowerCase() : "all";
+    const cacheKey = `listings:cat:${categoryKey}:title:${titleKey}`;
+
+    // 2. Check if cached data exists in Redis
+    const cachedListings = await redis.get(cacheKey);
+
+    if (cachedListings) {
+      console.log(`⚡ Cache Hit: ${cacheKey}`);
+      return res.status(200).json(JSON.parse(cachedListings));
+    }
+
+    console.log(`🐢 Cache Miss: Fetching from MongoDB (${cacheKey})`);
+
+    // 3. Query MongoDB if not in cache
     let filter = {};
 
     if (category && category !== "All") {
@@ -22,11 +40,16 @@ export const getAllListings = async (req, res) => {
       .populate("owner", "name email")
       .sort({ createdAt: -1 });
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
       count: listings.length,
       data: listings,
-    });
+    };
+
+    // 4. Save result in Redis with a 1-hour Time-To-Live (3600 seconds)
+    await redis.set(cacheKey, JSON.stringify(responseData), "EX", 3600);
+
+    return res.status(200).json(responseData);
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -114,6 +137,14 @@ export const createListing = async (req, res) => {
     }
 
     await listing.save();
+
+    // 5. Invalidate Cached Listings
+    // When a new listing is created, clear all listing caches so users get fresh data
+    const keys = await redis.keys("listings:*");
+    if (keys.length > 0) {
+      await redis.del(keys);
+      console.log(`🧹 Cache Invalidated: Cleared ${keys.length} key(s)`);
+    }
 
     return res.status(201).json({
       success: true,
