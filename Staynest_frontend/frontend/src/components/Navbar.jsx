@@ -1,29 +1,48 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Compass, Search, Menu, X, LogOut } from "lucide-react";
 import API from "../api/axios";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // 1. Initialize search term state from URL query parameter
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("query") || "");
+
+  // Sync state if URL search query changes externally
+  useEffect(() => {
+    setSearchTerm(searchParams.get("query") || "");
+  }, [searchParams]);
 
   // Retrieve user data from localStorage to toggle auth state
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = async () => {
     try {
-      // 1. Call backend to clear the HttpOnly JWT cookie
       await API.post("/auth/logout");
-
-      // 2. Remove user data from localStorage
       localStorage.removeItem("user");
-
-      // 3. Close mobile menu if open & redirect to login page
       setIsMobileMenuOpen(false);
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  // 2. Handle Search Form Submit
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const queryParams = new URLSearchParams(searchParams);
+
+    if (searchTerm.trim()) {
+      queryParams.set("query", searchTerm.trim());
+    } else {
+      queryParams.delete("query");
+    }
+
+    // Navigate to listings/home with updated query params
+    navigate(`/?${queryParams.toString()}`);
   };
 
   return (
@@ -40,20 +59,25 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Center Search Bar */}
-        <div className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
+        {/* Center Search Bar Form */}
+        <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
           <div className="flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition overflow-hidden bg-white">
             <input
               type="text"
-              placeholder="Search destinations"
+              placeholder="Search destinations, title, location..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm outline-none text-gray-700 bg-transparent placeholder-gray-400"
             />
-            <button className="bg-rose-500 hover:bg-rose-600 text-white px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-1.5 font-medium text-xs sm:text-sm transition shrink-0 rounded-r-full cursor-pointer">
+            <button
+              type="submit"
+              className="bg-rose-500 hover:bg-rose-600 text-white px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-1.5 font-medium text-xs sm:text-sm transition shrink-0 rounded-r-full cursor-pointer"
+            >
               <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">Search</span>
             </button>
           </div>
-        </div>
+        </form>
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-700 shrink-0">

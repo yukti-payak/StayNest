@@ -6,14 +6,18 @@ const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 // 1. Get All Listings (with Category & Search Support)
+// 1. Get All Listings (with Category & Multi-Field Search Support)
 export const getAllListings = async (req, res) => {
   try {
-    const { category, title } = req.query;
+    const { category, title, query, search } = req.query;
 
-    // 1. Generate a dynamic cache key based on query filters
+    // Standardize the search term coming from frontend (supports ?query=, ?search=, or ?title=)
+    const searchTerm = (query || search || title || "").trim();
+
+    // 1. Generate a dynamic cache key based on category and search query
     const categoryKey = category || "all";
-    const titleKey = title ? title.trim().toLowerCase() : "all";
-    const cacheKey = `listings:cat:${categoryKey}:title:${titleKey}`;
+    const searchQueryKey = searchTerm ? searchTerm.toLowerCase().replace(/\s+/g, "-") : "all";
+    const cacheKey = `listings:cat:${categoryKey}:search:${searchQueryKey}`;
 
     // 2. Check if cached data exists in Redis
     const cachedListings = await redis.get(cacheKey);
@@ -25,15 +29,23 @@ export const getAllListings = async (req, res) => {
 
     console.log(`🐢 Cache Miss: Fetching from MongoDB (${cacheKey})`);
 
-    // 3. Query MongoDB if not in cache
+    // 3. Query MongoDB
     let filter = {};
 
+    // Filter by Category if provided and not "All"
     if (category && category !== "All") {
       filter.category = category;
     }
 
-    if (title && title.trim() !== "") {
-      filter.title = { $regex: title.trim(),$options: "i" };
+    // Filter by Search Query across title, description, location, and country
+    if (searchTerm !== "") {
+      const regex = new RegExp(searchTerm, "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { location: regex },
+        { country: regex },
+      ];
     }
 
     const listings = await Listing.find(filter)
