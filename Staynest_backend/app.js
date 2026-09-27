@@ -8,6 +8,7 @@ import connectDB from "./config/db.js";
 import listingRoutes from "./routes/listingRoutes.js";
 import authRoutes from './routes/authRoutes.js';
 import reviewRoutes from "./routes/reviewRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 const PORT = 8080;
 const app = express();
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/listings/:id/reviews", reviewRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);

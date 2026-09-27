@@ -7,6 +7,7 @@ import NewListing from "./pages/NewListing.jsx"
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
 import EditListing from './pages/EditListing.jsx';
+import BookingSuccess from "./pages/BookingSuccess.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/listings/:id/edit" element={<EditListing />} />
 
           {/* Auth Routes */}
+          <Route path="/booking/success" element={<BookingSuccess />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         </Routes>

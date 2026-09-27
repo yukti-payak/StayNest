@@ -124,39 +124,28 @@ const ShowListing = () => {
 
     setBookingLoading(true);
     setBookingMessage("");
+try {
+    // 1. Send request to create a Stripe checkout session
+    const res = await API.post("/bookings/create-checkout-session", {
+      listingId: listing._id,
+      checkIn,
+      checkOut,
+    });
 
-    try {
-      await API.post("/bookings", {
-        listingId: listing._id,
-        checkIn,
-        checkOut,
-      });
-
-      setBookingMessage("🎉 Reservation successful!");
-
-      setCheckIn(null);
-      setCheckOut(null);
-
-      // Refresh booked dates after successful booking
-      const res = await API.get(
-        `/bookings/listing/${listing._id}/booked-dates`
-      );
-
-      const intervals = res.data.map((b) => ({
-        start: new Date(b.checkIn),
-        end: new Date(b.checkOut),
-      }));
-
-      setBookedIntervals(intervals);
-    } catch (err) {
-      setBookingMessage(
-        err.response?.data?.message || "Booking failed."
-      );
-    } finally {
-      setBookingLoading(false);
+    // 2. Redirect the user to Stripe Checkout page
+    if (res.data?.url) {
+      window.location.href = res.data.url;
+    } else {
+      setBookingMessage("Failed to initiate payment session.");
     }
-  };
-
+  } catch (err) {
+    setBookingMessage(
+      err.response?.data?.message || "Failed to create payment session."
+    );
+  } finally {
+    setBookingLoading(false);
+  }
+};
   // Mapbox Initialization Effect
   useEffect(() => {
     if (!listing || !mapContainerRef.current) return;

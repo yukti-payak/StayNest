@@ -1,10 +1,18 @@
 import express from "express";
-import { createBooking, getListingBookedDates } from "../controllers/bookingController.js";
-import { protect } from "../middleware/authMiddleware.js"; // Your auth middleware
+import {
+  createCheckoutSession,
+  confirmPayment,
+  getBookedDates,
+} from "../controllers/bookingController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/listing/:listingId/booked-dates", getListingBookedDates);
-router.post("/", protect, createBooking);
+// Public: Fetch booked dates for calendar disabling
+router.get("/listing/:listingId/booked-dates", getBookedDates);
+
+// Protected: Checkout & Payment Confirmation
+router.post("/create-checkout-session", protect, createCheckoutSession);
+router.post("/confirm-payment", protect, confirmPayment);
 
 export default router;
