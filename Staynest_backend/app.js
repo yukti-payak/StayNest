@@ -9,6 +9,7 @@ import listingRoutes from "./routes/listingRoutes.js";
 import authRoutes from './routes/authRoutes.js';
 import reviewRoutes from "./routes/reviewRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
 
 const PORT = 8080;
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/listings/:id/reviews", reviewRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);

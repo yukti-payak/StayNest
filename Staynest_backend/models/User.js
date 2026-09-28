@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Listing",
+      },
+    ],
   },
   {
     timestamps: true,
