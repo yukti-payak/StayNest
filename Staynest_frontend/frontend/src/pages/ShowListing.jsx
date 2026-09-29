@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -15,6 +14,7 @@ import {
   Trash2,
   Edit,
   ShieldCheck,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
 const ShowListing = () => {
@@ -29,9 +29,7 @@ const ShowListing = () => {
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // =========================
   // Booking State
-  // =========================
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
   const [bookedIntervals, setBookedIntervals] = useState([]);
@@ -64,9 +62,7 @@ const ShowListing = () => {
     fetchListing();
   }, [id]);
 
-  // =========================
   // Fetch Already Booked Dates
-  // =========================
   useEffect(() => {
     const fetchBookedDates = async () => {
       try {
@@ -86,22 +82,15 @@ const ShowListing = () => {
     fetchBookedDates();
   }, [id]);
 
-  // =========================
   // Calculate Booking Price
-  // =========================
   const nights =
     checkIn && checkOut
-      ? Math.ceil(
-          (checkOut - checkIn) / (1000 * 60 * 60 * 24)
-        )
+      ? Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24))
       : 0;
 
-  const totalPrice =
-    nights > 0 ? nights * Number(listing?.price || 0) : 0;
+  const totalPrice = nights > 0 ? nights * Number(listing?.price || 0) : 0;
 
-  // =========================
   // Handle Booking
-  // =========================
   const handleBooking = async () => {
     if (!user) {
       setBookingMessage("Please log in to reserve this stay.");
@@ -109,52 +98,46 @@ const ShowListing = () => {
     }
 
     if (!checkIn || !checkOut) {
-      setBookingMessage(
-        "Please select valid check-in and check-out dates."
-      );
+      setBookingMessage("Please select valid check-in and check-out dates.");
       return;
     }
 
     if (checkOut <= checkIn) {
-      setBookingMessage(
-        "Check-out date must be after check-in date."
-      );
+      setBookingMessage("Check-out date must be after check-in date.");
       return;
     }
 
     setBookingLoading(true);
     setBookingMessage("");
-try {
-    // 1. Send request to create a Stripe checkout session
-    const res = await API.post("/bookings/create-checkout-session", {
-      listingId: listing._id,
-      checkIn,
-      checkOut,
-    });
 
-    // 2. Redirect the user to Stripe Checkout page
-    if (res.data?.url) {
-      window.location.href = res.data.url;
-    } else {
-      setBookingMessage("Failed to initiate payment session.");
+    try {
+      const res = await API.post("/bookings/create-checkout-session", {
+        listingId: listing._id,
+        checkIn,
+        checkOut,
+      });
+
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        setBookingMessage("Failed to initiate payment session.");
+      }
+    } catch (err) {
+      setBookingMessage(
+        err.response?.data?.message || "Failed to create payment session."
+      );
+    } finally {
+      setBookingLoading(false);
     }
-  } catch (err) {
-    setBookingMessage(
-      err.response?.data?.message || "Failed to create payment session."
-    );
-  } finally {
-    setBookingLoading(false);
-  }
-};
+  };
+
   // Mapbox Initialization Effect
   useEffect(() => {
     if (!listing || !mapContainerRef.current) return;
 
-    mapboxgl.accessToken =
-      import.meta.env.VITE_MAPBOX_TOKEN || "";
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || "";
 
-    const coordinates =
-      listing.geometry?.coordinates || [77.209, 28.6139];
+    const coordinates = listing.geometry?.coordinates || [77.209, 28.6139];
 
     if (mapRef.current) return;
 
@@ -202,8 +185,7 @@ try {
       navigate("/");
     } catch (err) {
       alert(
-        err.response?.data?.message ||
-          "Failed to delete listing."
+        err.response?.data?.message || "Failed to delete listing."
       );
     } finally {
       setDeleting(false);
@@ -256,20 +238,15 @@ try {
     if (!confirmDelete) return;
 
     try {
-      await API.delete(
-        `/listings/${id}/reviews/${reviewId}`
-      );
+      await API.delete(`/listings/${id}/reviews/${reviewId}`);
 
       setListing((prev) => ({
         ...prev,
-        reviews: prev.reviews.filter(
-          (rev) => rev._id !== reviewId
-        ),
+        reviews: prev.reviews.filter((rev) => rev._id !== reviewId),
       }));
     } catch (err) {
       alert(
-        err.response?.data?.message ||
-          "Failed to delete review."
+        err.response?.data?.message || "Failed to delete review."
       );
     }
   };
@@ -278,15 +255,12 @@ try {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-
         <div className="flex-1 flex flex-col items-center justify-center gap-3">
           <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
-
           <p className="text-gray-500 text-sm font-medium">
             Loading stay details…
           </p>
         </div>
-
         <Footer />
       </div>
     );
@@ -296,20 +270,14 @@ try {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-
         <div className="flex-1 max-w-md mx-auto my-24 px-6 text-center">
           <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
             <AlertCircle className="w-7 h-7" />
           </div>
-
           <h2 className="text-xl font-bold text-gray-900 mb-2">
             Listing Unavailable
           </h2>
-
-          <p className="text-gray-600 text-sm mb-6">
-            {error}
-          </p>
-
+          <p className="text-gray-600 text-sm mb-6">{error}</p>
           <Link
             to="/"
             className="inline-flex items-center justify-center bg-rose-500 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-rose-600 transition-all shadow-md hover:shadow-rose-200"
@@ -317,7 +285,6 @@ try {
             Back to Explore
           </Link>
         </div>
-
         <Footer />
       </div>
     );
@@ -332,8 +299,7 @@ try {
   const isOwner =
     user &&
     listing?.owner &&
-    (user._id === listing.owner._id ||
-      user._id === listing.owner);
+    (user._id === listing.owner._id || user._id === listing.owner);
 
   const ownerName =
     typeof listing.owner === "object"
@@ -346,18 +312,15 @@ try {
     <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full">
-
-        {/* Clean, Normal Title Section */}
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
+        {/* Title Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
               {listing.title}
             </h1>
-
             <p className="flex items-center gap-1.5 text-gray-600 text-sm mt-1.5 font-medium">
               <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
-
               <span>
                 {listing.location}, {listing.country}
               </span>
@@ -374,385 +337,343 @@ try {
                 <Edit className="w-3.5 h-3.5" />
                 Edit
               </Link>
-
               <button
                 onClick={handleDelete}
                 disabled={deleting}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-xl text-xs transition-all disabled:opacity-50"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-
                 {deleting ? "Deleting…" : "Delete"}
               </button>
             </div>
           )}
         </div>
 
-        {/* Compact Image Display */}
+        {/* Hero Image */}
         <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm mb-8">
           <img
             src={imageUrl}
             alt={listing.title}
-            className="w-full h-[280px] sm:h-[360px] object-cover"
+            className="w-full h-[320px] sm:h-[420px] object-cover"
           />
         </div>
 
-        {/* Listing Details & Pricing */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-base shadow-sm">
-                {ownerName.charAt(0).toUpperCase()}
+        {/* Main Content Side-by-Side Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          
+          {/* Left Column (2 Cols): Details, Map & Reviews */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* Host & Description Card */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+              <div className="flex items-center gap-3 pb-6 border-b border-gray-100">
+                <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                  {ownerName.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Hosted by
+                  </p>
+                  <p className="text-base font-bold text-gray-900 flex items-center gap-1.5">
+                    {ownerName}
+                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-xs text-gray-500 font-medium">
-                  Hosted by
-                </p>
-
-                <p className="text-sm font-bold text-gray-900 flex items-center gap-1">
-                  {ownerName}
-
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <div className="pt-6">
+                <h2 className="text-lg font-bold text-gray-900 mb-3">
+                  About this stay
+                </h2>
+                <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
+                  {listing.description}
                 </p>
               </div>
             </div>
 
-            <div className="text-left sm:text-right bg-slate-50 sm:bg-transparent p-3 sm:p-0 rounded-xl w-full sm:w-auto border sm:border-0 border-slate-100">
-              <span className="text-2xl font-black text-rose-600">
-                &#8377;
-                {Number(listing.price || 0).toLocaleString(
-                  "en-IN"
-                )}
-              </span>
+            {/* Map Section */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-rose-500" />
+                  Where you'll be
+                </h2>
+                <p className="text-gray-500 text-xs mt-0.5">
+                  {listing.location}, {listing.country}
+                </p>
+              </div>
 
-              <span className="text-gray-500 text-xs font-semibold">
-                {" "}
-                / night
-              </span>
-            </div>
-          </div>
-
-          <div className="pt-6">
-            <h3 className="text-base font-bold text-gray-900 mb-2">
-              Description
-            </h3>
-
-            <p className="text-gray-600 leading-relaxed text-sm">
-              {listing.description}
-            </p>
-          </div>
-        </div>
-
-        {/* =========================
-            Booking Section
-        ========================= */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md mb-8">
-          <h3 className="text-xl font-bold mb-4">
-            ₹
-            {Number(listing.price || 0).toLocaleString(
-              "en-IN"
-            )}
-
-            <span className="text-sm text-gray-500 font-normal">
-              {" "}
-              / night
-            </span>
-          </h3>
-
-          {bookingMessage && (
-            <div
-              className={`mb-4 text-xs font-semibold p-3 rounded-xl ${
-                bookingMessage.includes("successful")
-                  ? "text-emerald-600 bg-emerald-50"
-                  : "text-rose-600 bg-rose-50"
-              }`}
-            >
-              {bookingMessage}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            {/* Check-In */}
-            <div>
-              <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-                Check-In
-              </label>
-
-              <DatePicker
-                selected={checkIn}
-                onChange={(date) => {
-                  setCheckIn(date);
-
-                  // Clear checkout if it is before the new check-in
-                  if (checkOut && date >= checkOut) {
-                    setCheckOut(null);
-                  }
-                }}
-                selectsStart
-                startDate={checkIn}
-                endDate={checkOut}
-                minDate={new Date()}
-                excludeDateIntervals={bookedIntervals}
-                placeholderText="Add date"
-                className="w-full p-2.5 border rounded-xl text-sm"
+              <div
+                ref={mapContainerRef}
+                className="w-full h-[280px] sm:h-[320px] rounded-xl border border-gray-200 overflow-hidden shadow-inner"
               />
             </div>
 
-            {/* Check-Out */}
-            <div>
-              <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">
-                Check-Out
-              </label>
+            {/* Reviews Section */}
+            <section className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+              {user && (
+                <div className="mb-8 pb-8 border-b border-gray-100">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Leave a Review
+                  </h3>
 
-              <DatePicker
-                selected={checkOut}
-                onChange={(date) => setCheckOut(date)}
-                selectsEnd
-                startDate={checkIn}
-                endDate={checkOut}
-                minDate={checkIn || new Date()}
-                excludeDateIntervals={bookedIntervals}
-                placeholderText="Add date"
-                className="w-full p-2.5 border rounded-xl text-sm"
-              />
-            </div>
-          </div>
+                  {reviewError && (
+                    <div className="p-3 mb-4 bg-rose-50 text-rose-600 rounded-xl text-xs flex items-center gap-2 border border-rose-100">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      {reviewError}
+                    </div>
+                  )}
 
-          {/* Price Calculation */}
-          {nights > 0 && (
-            <div className="space-y-2 text-sm border-t pt-4 mb-4">
-              <div className="flex justify-between text-gray-600">
-                <span>
-                  ₹{Number(listing.price).toLocaleString("en-IN")}{" "}
-                  x {nights} nights
-                </span>
+                  <form onSubmit={handleReviewSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                        Rating
+                      </label>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            type="button"
+                            key={star}
+                            onClick={() => setRating(star)}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            className="p-1 focus:outline-none transition-transform hover:scale-110"
+                          >
+                            <Star
+                              className={`w-6 h-6 ${
+                                star <= (hoverRating || rating)
+                                  ? "text-amber-400 fill-amber-400"
+                                  : "text-gray-200"
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                <span>
-                  ₹{totalPrice.toLocaleString("en-IN")}
-                </span>
-              </div>
+                    <div>
+                      <label
+                        htmlFor="comment"
+                        className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1"
+                      >
+                        Your Experience
+                      </label>
+                      <textarea
+                        id="comment"
+                        rows="3"
+                        placeholder="Describe your stay and what future visitors should know..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        className="w-full p-3.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-slate-50/50"
+                        required
+                      />
+                    </div>
 
-              <div className="flex justify-between font-bold text-gray-900 border-t pt-2">
-                <span>Total</span>
-
-                <span>
-                  ₹{totalPrice.toLocaleString("en-IN")}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={handleBooking}
-            disabled={bookingLoading || nights <= 0}
-            className="w-full py-3 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition-all disabled:opacity-50"
-          >
-            {bookingLoading ? "Processing..." : "Reserve"}
-          </button>
-        </div>
-
-        {/* Map Section */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm mb-8">
-          <div className="mb-4">
-            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-rose-500" />
-
-              Where you'll be
-            </h2>
-
-            <p className="text-gray-500 text-xs mt-0.5">
-              {listing.location}, {listing.country}
-            </p>
-          </div>
-
-          <div
-            ref={mapContainerRef}
-            className="w-full h-[280px] sm:h-[320px] rounded-xl border border-gray-200 overflow-hidden shadow-inner"
-          />
-        </div>
-
-        {/* Reviews Section */}
-        <section className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-          {user && (
-            <div className="mb-8 pb-8 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Leave a Review
-              </h3>
-
-              {reviewError && (
-                <div className="p-3 mb-4 bg-rose-50 text-rose-600 rounded-xl text-xs flex items-center gap-2 border border-rose-100">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-
-                  {reviewError}
+                    <button
+                      type="submit"
+                      disabled={submittingReview}
+                      className="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-sm"
+                    >
+                      {submittingReview ? "Submitting…" : "Post Review"}
+                    </button>
+                  </form>
                 </div>
               )}
 
-              <form
-                onSubmit={handleReviewSubmit}
-                className="space-y-4"
-              >
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                    Rating
-                  </label>
-
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        type="button"
-                        key={star}
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() =>
-                          setHoverRating(star)
-                        }
-                        onMouseLeave={() =>
-                          setHoverRating(0)
-                        }
-                        className="p-1 focus:outline-none transition-transform hover:scale-110"
-                      >
-                        <Star
-                          className={`w-6 h-6 ${
-                            star <=
-                            (hoverRating || rating)
-                              ? "text-amber-400 fill-amber-400"
-                              : "text-gray-200"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                    Guest Reviews
+                  </h3>
+                  <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">
+                    {listing.reviews ? listing.reviews.length : 0} total
+                  </span>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="comment"
-                    className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1"
-                  >
-                    Your Experience
-                  </label>
+                {listing.reviews && listing.reviews.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {listing.reviews.map((rev) => {
+                      const isReviewAuthor =
+                        user &&
+                        rev.author &&
+                        (user._id === rev.author._id ||
+                          user._id === rev.author);
 
-                  <textarea
-                    id="comment"
-                    rows="3"
-                    placeholder="Describe your stay and what future visitors should know..."
-                    value={comment}
-                    onChange={(e) =>
-                      setComment(e.target.value)
-                    }
-                    className="w-full p-3.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-slate-50/50"
-                    required
-                  />
-                </div>
+                      const authorName =
+                        rev.author?.username ||
+                        rev.author?.name ||
+                        "Guest";
 
-                <button
-                  type="submit"
-                  disabled={submittingReview}
-                  className="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-sm"
-                >
-                  {submittingReview
-                    ? "Submitting…"
-                    : "Post Review"}
-                </button>
-              </form>
-            </div>
-          )}
+                      return (
+                        <div
+                          key={rev._id}
+                          className="bg-slate-50/60 border border-gray-200 rounded-xl p-4 flex flex-col justify-between hover:border-gray-300 transition-all"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs">
+                                  {authorName.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="font-semibold text-gray-900 text-xs">
+                                  @{authorName}
+                                </span>
+                              </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-
-                Guest Reviews
-              </h3>
-
-              <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">
-                {listing.reviews
-                  ? listing.reviews.length
-                  : 0}{" "}
-                total
-              </span>
-            </div>
-
-            {listing.reviews &&
-            listing.reviews.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {listing.reviews.map((rev) => {
-                  const isReviewAuthor =
-                    user &&
-                    rev.author &&
-                    (user._id === rev.author._id ||
-                      user._id === rev.author);
-
-                  const authorName =
-                    rev.author?.username ||
-                    rev.author?.name ||
-                    "Guest";
-
-                  return (
-                    <div
-                      key={rev._id}
-                      className="bg-slate-50/60 border border-gray-200 rounded-xl p-4 flex flex-col justify-between hover:border-gray-300 transition-all"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs">
-                              {authorName
-                                .charAt(0)
-                                .toUpperCase()}
+                              <div className="flex items-center gap-0.5 text-amber-400 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
+                                <Star className="w-3 h-3 fill-amber-400" />
+                                <span className="text-xs font-bold text-amber-700">
+                                  {rev.rating}.0
+                                </span>
+                              </div>
                             </div>
 
-                            <span className="font-semibold text-gray-900 text-xs">
-                              @{authorName}
-                            </span>
+                            <p className="text-gray-600 text-xs leading-relaxed">
+                              {rev.comment}
+                            </p>
                           </div>
 
-                          <div className="flex items-center gap-0.5 text-amber-400 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
-                            <Star className="w-3 h-3 fill-amber-400" />
-
-                            <span className="text-xs font-bold text-amber-700">
-                              {rev.rating}.0
-                            </span>
-                          </div>
+                          {isReviewAuthor && (
+                            <div className="mt-4 pt-2.5 border-t border-gray-200/60 flex justify-end">
+                              <button
+                                onClick={() => handleDeleteReview(rev._id)}
+                                className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-xs font-semibold transition-all"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </div>
-
-                        <p className="text-gray-600 text-xs leading-relaxed">
-                          {rev.comment}
-                        </p>
-                      </div>
-
-                      {isReviewAuthor && (
-                        <div className="mt-4 pt-2.5 border-t border-gray-200/60 flex justify-end">
-                          <button
-                            onClick={() =>
-                              handleDeleteReview(
-                                rev._id
-                              )
-                            }
-                            className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-xs font-semibold transition-all"
-                          >
-                            <Trash2 className="w-3 h-3" />
-
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-xs italic text-center py-4">
+                    No reviews yet for this listing.
+                  </p>
+                )}
               </div>
-            ) : (
-              <p className="text-gray-400 text-xs italic text-center py-4">
-                No reviews yet for this listing.
-              </p>
-            )}
+            </section>
           </div>
-        </section>
+
+          {/* Right Column (1 Col): Sticky Booking / Reservation Form */}
+          <div className="lg:col-span-1">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xl sticky top-24">
+              <div className="flex items-baseline justify-between mb-6 pb-4 border-b border-gray-100">
+                <div>
+                  <span className="text-2xl font-black text-rose-600">
+                    &#8377;
+                    {Number(listing.price || 0).toLocaleString("en-IN")}
+                  </span>
+                  <span className="text-gray-500 text-xs font-semibold">
+                    {" "}
+                    / night
+                  </span>
+                </div>
+              </div>
+
+              {bookingMessage && (
+                <div
+                  className={`mb-4 text-xs font-semibold p-3 rounded-xl ${
+                    bookingMessage.includes("successful")
+                      ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
+                      : "text-rose-600 bg-rose-50 border border-rose-100"
+                  }`}
+                >
+                  {bookingMessage}
+                </div>
+              )}
+
+              {/* Enhanced Unified Date Picker Container */}
+              <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 shadow-sm focus-within:ring-2 focus-within:ring-rose-500/30 transition-all">
+                <div className="grid grid-cols-2 divide-x divide-gray-200">
+                  {/* Check-In */}
+                  <div className="p-3 bg-white hover:bg-slate-50 transition-colors">
+                    <label className="block text-[10px] font-black uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
+                      <CalendarIcon className="w-3 h-3 text-rose-500" />
+                      Check-In
+                    </label>
+                    <DatePicker
+                      selected={checkIn}
+                      onChange={(date) => {
+                        setCheckIn(date);
+                        if (checkOut && date >= checkOut) {
+                          setCheckOut(null);
+                        }
+                      }}
+                      selectsStart
+                      startDate={checkIn}
+                      endDate={checkOut}
+                      minDate={new Date()}
+                      excludeDateIntervals={bookedIntervals}
+                      placeholderText="Add date"
+                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Check-Out */}
+                  <div className="p-3 bg-white hover:bg-slate-50 transition-colors">
+                    <label className="block text-[10px] font-black uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
+                      <CalendarIcon className="w-3 h-3 text-rose-500" />
+                      Check-Out
+                    </label>
+                    <DatePicker
+                      selected={checkOut}
+                      onChange={(date) => setCheckOut(date)}
+                      selectsEnd
+                      startDate={checkIn}
+                      endDate={checkOut}
+                      minDate={checkIn || new Date()}
+                      excludeDateIntervals={bookedIntervals}
+                      placeholderText="Add date"
+                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Calculation Summary */}
+              {nights > 0 && (
+                <div className="space-y-2.5 text-xs border-t border-gray-100 pt-4 mb-5">
+                  <div className="flex justify-between text-gray-600">
+                    <span>
+                      ₹{Number(listing.price).toLocaleString("en-IN")} x{" "}
+                      {nights} {nights === 1 ? "night" : "nights"}
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      ₹{totalPrice.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-100 pt-3">
+                    <span>Total before taxes</span>
+                    <span className="text-rose-600 font-extrabold">
+                      ₹{totalPrice.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={handleBooking}
+                disabled={bookingLoading || nights <= 0}
+                className="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-xl transition-all shadow-md hover:shadow-rose-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {bookingLoading ? "Processing..." : "Reserve Stay"}
+              </button>
+
+              <p className="text-[11px] text-gray-400 text-center mt-3">
+                You won't be charged until the next step.
+              </p>
+            </div>
+          </div>
+
+        </div>
       </main>
     </div>
   );
 };
 
 export default ShowListing;
-

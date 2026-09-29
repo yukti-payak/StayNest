@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Compass, Search, Menu, X, LogOut } from "lucide-react";
+import { Search, Menu, X, LogOut } from "lucide-react";
 import API from "../api/axios";
+
+// Import your logo image if stored in src/assets
+// import logoImg from "../assets/logo.png";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -49,14 +52,13 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Brand Logo & Name */}
-        <Link to="/" className="flex items-center space-x-2 shrink-0 cursor-pointer text-rose-500">
-          <div className="bg-rose-500 text-white p-1.5 sm:p-2 rounded-full flex items-center justify-center shadow-sm">
-            <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
-          </div>
-          <span className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight hidden sm:inline">
-            Explore
-          </span>
+        {/* Brand Logo */}
+        <Link to="/" className="flex items-center shrink-0 cursor-pointer">
+          <img
+            src="/logo.png" 
+            alt="StayNest Logo" 
+            className="h-12 sm:h-16 w-auto object-contain max-w-[180px] sm:max-w-[220px]"
+          />
         </Link>
 
         {/* Center Search Bar Form */}
