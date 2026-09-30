@@ -1,4 +1,3 @@
-// pages/Wishlist.jsx
 import React, { useEffect, useState } from "react";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
@@ -12,7 +11,9 @@ const Wishlist = () => {
     const fetchWishlist = async () => {
       try {
         const res = await API.get("/wishlist");
-        setWishlistItems(res.data.data || []);
+        // Safe extraction covering various backend response shapes
+        const items = res.data.data || res.data.wishlist || res.data || [];
+        setWishlistItems(Array.isArray(items) ? items : []);
       } catch (err) {
         console.error("Failed to fetch wishlist:", err);
       } finally {

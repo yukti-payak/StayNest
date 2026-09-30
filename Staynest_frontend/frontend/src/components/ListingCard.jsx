@@ -8,28 +8,47 @@ const ListingCard = ({ listing, initialWishlisted = false }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleWishlistToggle = async (e) => {
-    e.preventDefault(); // Prevent navigating to single listing detail page
-    e.stopPropagation();
+const handleWishlistToggle = async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
-    const currentUser = localStorage.getItem("user");
-    if (!currentUser) {
-      navigate("/login");
-      return;
-    }
-
-    setLoading(true);
+  // 1. Get token
+  let token = localStorage.getItem("token");
+  if (!token || token === "undefined") {
+    const storedUser = localStorage.getItem("user");
     try {
-      const res = await API.post("/wishlist/toggle", { listingId: listing._id });
-      if (res.data.success) {
-        setIsWishlisted((prev) => !prev);
-      }
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      token = parsedUser?.token;
     } catch (err) {
-      console.error("Wishlist toggle error:", err);
-    } finally {
-      setLoading(false);
+      token = null;
     }
-  };
+  }
+
+  // 2. If no valid token found, go to login
+  if (!token || token === "undefined") {
+    console.warn("No token found in localStorage. Redirecting to login.");
+    navigate("/login");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await API.post("/wishlist/toggle", { listingId: listing._id });
+    if (res.data.success) {
+      setIsWishlisted((prev) => !prev);
+    }
+  } catch (err) {
+    console.error("Wishlist toggle error details:", err.response?.data || err.message);
+    
+    // Comment out automatic navigate for a moment if you want to inspect DevTools Network tab
+    if (err.response?.status === 401) {
+      alert("Session expired or unauthorized. Please log in again.");
+      navigate("/login");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Link to={`/listings/${listing._id}`} className="block group">

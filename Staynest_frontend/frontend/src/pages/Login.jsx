@@ -13,6 +13,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 1. Defined inside the component scope
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -25,10 +26,14 @@ const Login = () => {
     try {
       const res = await API.post("/auth/login", formData);
 
-      // Save non-sensitive user details locally if needed (Cookie handles authentication)
-      if (res.data) {
-        localStorage.setItem("user", JSON.stringify(res.data));
+      // Extract token and user object dynamically
+      const token = res.data.token || res.data.data?.token;
+      const user = res.data.user || res.data.data?.user || res.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
       }
+      localStorage.setItem("user", JSON.stringify(user));
 
       navigate("/");
     } catch (err) {

@@ -1,30 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Menu, X, LogOut } from "lucide-react";
+import { Search, Menu, X, LogOut, Heart } from "lucide-react";
 import API from "../api/axios";
-
-// Import your logo image if stored in src/assets
-// import logoImg from "../assets/logo.png";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // 1. Initialize search term state from URL query parameter
   const [searchTerm, setSearchTerm] = useState(searchParams.get("query") || "");
 
-  // Sync state if URL search query changes externally
   useEffect(() => {
     setSearchTerm(searchParams.get("query") || "");
   }, [searchParams]);
 
-  // Retrieve user data from localStorage to toggle auth state
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = async () => {
     try {
       await API.post("/auth/logout");
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
       setIsMobileMenuOpen(false);
       navigate("/login");
@@ -33,7 +28,6 @@ const Navbar = () => {
     }
   };
 
-  // 2. Handle Search Form Submit
   const handleSearch = (e) => {
     e.preventDefault();
     const queryParams = new URLSearchParams(searchParams);
@@ -44,7 +38,6 @@ const Navbar = () => {
       queryParams.delete("query");
     }
 
-    // Navigate to listings/home with updated query params
     navigate(`/?${queryParams.toString()}`);
   };
 
@@ -61,7 +54,7 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Center Search Bar Form */}
+        {/* Center Search Bar */}
         <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
           <div className="flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition overflow-hidden bg-white">
             <input
@@ -85,6 +78,12 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-700 shrink-0">
           <Link to="/listings/new" className="hover:text-rose-500 transition cursor-pointer">
             Add new listing
+          </Link>
+
+          {/* WISHLIST LINK */}
+          <Link to="/wishlist" className="hover:text-rose-500 transition cursor-pointer flex items-center gap-1">
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+            <span>Wishlist</span>
           </Link>
 
           {user ? (
@@ -132,6 +131,15 @@ const Navbar = () => {
             className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
           >
             Add new listing
+          </Link>
+
+          <Link
+            to="/wishlist"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-2 w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+          >
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+            <span>Wishlist</span>
           </Link>
 
           {user ? (
