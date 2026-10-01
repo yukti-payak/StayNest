@@ -15,6 +15,18 @@ import {
   Edit,
   ShieldCheck,
   Calendar as CalendarIcon,
+  Wifi,
+  Car,
+  Utensils,
+  Laptop,
+  Tv,
+  Wind,
+  Share2,
+  Heart,
+  Grid,
+  X,
+  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 
 const ShowListing = () => {
@@ -28,6 +40,8 @@ const ShowListing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   // Booking State
   const [checkIn, setCheckIn] = useState(null);
@@ -88,7 +102,9 @@ const ShowListing = () => {
       ? Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24))
       : 0;
 
-  const totalPrice = nights > 0 ? nights * Number(listing?.price || 0) : 0;
+  const basePrice = nights > 0 ? nights * Number(listing?.price || 0) : 0;
+  const serviceFee = nights > 0 ? Math.round(basePrice * 0.08) : 0;
+  const totalPrice = basePrice + serviceFee;
 
   // Handle Booking
   const handleBooking = async () => {
@@ -145,7 +161,7 @@ const ShowListing = () => {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: coordinates,
-      zoom: 12,
+      zoom: 13,
     });
 
     mapRef.current.addControl(
@@ -157,12 +173,12 @@ const ShowListing = () => {
       .setLngLat(coordinates)
       .setPopup(
         new mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<div style="padding: 4px;">
-            <h4 style="font-weight:700;margin-bottom:2px;">
+          `<div style="padding: 6px;">
+            <h4 style="font-weight:700;margin-bottom:2px;font-size:13px;">
               ${listing.title}
             </h4>
-            <p style="font-size:12px;color:#666;margin:0;">
-              Exact location provided after booking
+            <p style="font-size:11px;color:#666;margin:0;">
+              Exact location provided after booking confirmation
             </p>
           </div>`
         )
@@ -253,7 +269,7 @@ const ShowListing = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-3">
           <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
@@ -308,96 +324,212 @@ const ShowListing = () => {
         listing.owner?.email
       : "Verified Host";
 
+  const averageRating =
+    listing.reviews && listing.reviews.length > 0
+      ? (
+          listing.reviews.reduce((acc, rev) => acc + rev.rating, 0) /
+          listing.reviews.length
+        ).toFixed(1)
+      : null;
+
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full">
+      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full">
         {/* Title Header */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              {listing.title}
-            </h1>
-            <p className="flex items-center gap-1.5 text-gray-600 text-sm mt-1.5 font-medium">
-              <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
-              <span>
+        <div className="mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-2">
+            {listing.title}
+          </h1>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div className="flex items-center gap-4 flex-wrap text-gray-700">
+              {averageRating && (
+                <span className="flex items-center gap-1 font-semibold text-gray-900">
+                  <Star className="w-4 h-4 fill-rose-500 text-rose-500" />
+                  {averageRating}
+                  <span className="text-gray-500 font-normal underline">
+                    ({listing.reviews.length} reviews)
+                  </span>
+                </span>
+              )}
+              <span className="flex items-center gap-1 font-medium text-gray-700 underline cursor-pointer">
+                <MapPin className="w-4 h-4 text-rose-500" />
                 {listing.location}, {listing.country}
               </span>
-            </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsSaved(!isSaved)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-all border border-gray-200"
+              >
+                <Heart
+                  className={`w-3.5 h-3.5 ${
+                    isSaved ? "fill-rose-500 text-rose-500" : ""
+                  }`}
+                />
+                {isSaved ? "Saved" : "Save"}
+              </button>
+
+              {isOwner && (
+                <div className="flex items-center gap-2 ml-2">
+                  <Link
+                    to={`/listings/${id}/edit`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg text-xs transition-all"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                    Edit
+                  </Link>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-lg text-xs transition-all disabled:opacity-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {deleting ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Multi-Photo Gallery Grid */}
+        <div className="relative rounded-2xl overflow-hidden mb-8 shadow-sm group">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[340px] sm:h-[420px]">
+            <div className="md:col-span-2 h-full overflow-hidden">
+              <img
+                src={imageUrl}
+                alt={listing.title}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+                onClick={() => setShowGalleryModal(true)}
+              />
+            </div>
+            <div className="hidden md:grid md:col-span-2 grid-cols-2 gap-2 h-full">
+              <div className="overflow-hidden h-full">
+                <img
+                  src={imageUrl}
+                  alt={listing.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer brightness-95"
+                  onClick={() => setShowGalleryModal(true)}
+                />
+              </div>
+              <div className="overflow-hidden h-full">
+                <img
+                  src={imageUrl}
+                  alt={listing.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer brightness-90"
+                  onClick={() => setShowGalleryModal(true)}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Owner Actions */}
-          {isOwner && (
-            <div className="flex items-center gap-2 shrink-0">
-              <Link
-                to={`/listings/${id}/edit`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-medium rounded-xl text-xs transition-all shadow-sm"
-              >
-                <Edit className="w-3.5 h-3.5" />
-                Edit
-              </Link>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-xl text-xs transition-all disabled:opacity-50"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                {deleting ? "Deleting…" : "Delete"}
-              </button>
-            </div>
-          )}
+          <button
+            onClick={() => setShowGalleryModal(true)}
+            className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-gray-900 border border-gray-300 font-medium text-xs px-3.5 py-2 rounded-xl backdrop-blur-md shadow-md flex items-center gap-2 transition-all"
+          >
+            <Grid className="w-3.5 h-3.5" />
+            Show all photos
+          </button>
         </div>
 
-        {/* Hero Image */}
-        <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm mb-8">
-          <img
-            src={imageUrl}
-            alt={listing.title}
-            className="w-full h-[320px] sm:h-[420px] object-cover"
-          />
-        </div>
-
-        {/* Main Content Side-by-Side Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          
-          {/* Left Column (2 Cols): Details, Map & Reviews */}
+        {/* Main Content Side-by-Side Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+          {/* Left Column (2 Cols): Host, Features, Description, Amenities, Map, Reviews */}
           <div className="lg:col-span-2 space-y-8">
-            
-            {/* Host & Description Card */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-              <div className="flex items-center gap-3 pb-6 border-b border-gray-100">
-                <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
-                  {ownerName.charAt(0).toUpperCase()}
-                </div>
+            {/* Host Section */}
+            <div className="pb-6 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                  Entire stay hosted by {ownerName}
+                </h2>
+                <p className="text-xs text-gray-500 font-medium">
+                  2 guests · 1 bedroom · 1 bed · 1 bath
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                {ownerName.charAt(0).toUpperCase()}
+              </div>
+            </div>
+
+            {/* Highlights */}
+            <div className="space-y-4 pb-6 border-b border-gray-200">
+              <div className="flex items-start gap-4">
+                <Sparkles className="w-5 h-5 text-rose-500 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-xs text-gray-500 font-medium">
-                    Hosted by
-                  </p>
-                  <p className="text-base font-bold text-gray-900 flex items-center gap-1.5">
-                    {ownerName}
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <h4 className="text-sm font-bold text-gray-900">
+                    Experienced Host
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    {ownerName} has great reviews from verified stays.
                   </p>
                 </div>
               </div>
+              <div className="flex items-start gap-4">
+                <CheckCircle2 className="w-5 h-5 text-rose-500 mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">
+                    Great Location
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    95% of recent guests gave the location a 5-star rating.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              <div className="pt-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-3">
-                  About this stay
-                </h2>
-                <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
-                  {listing.description}
-                </p>
+            {/* Description */}
+            <div className="pb-8 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">
+                About this space
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
+                {listing.description}
+              </p>
+            </div>
+
+            {/* Amenities Grid */}
+            <div className="pb-8 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                What this place offers
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div className="flex items-center gap-3">
+                  <Wifi className="w-4 h-4 text-gray-600" />
+                  <span>Fast Wi-Fi</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Car className="w-4 h-4 text-gray-600" />
+                  <span>Free driveway parking</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Utensils className="w-4 h-4 text-gray-600" />
+                  <span>Fully equipped kitchen</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Laptop className="w-4 h-4 text-gray-600" />
+                  <span>Dedicated workspace</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Tv className="w-4 h-4 text-gray-600" />
+                  <span>55" HDTV with Netflix</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Wind className="w-4 h-4 text-gray-600" />
+                  <span>Air conditioning</span>
+                </div>
               </div>
             </div>
 
             {/* Map Section */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div className="pb-8 border-b border-gray-200">
               <div className="mb-4">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-rose-500" />
+                <h3 className="text-lg font-bold text-gray-900">
                   Where you'll be
-                </h2>
+                </h3>
                 <p className="text-gray-500 text-xs mt-0.5">
                   {listing.location}, {listing.country}
                 </p>
@@ -405,17 +537,28 @@ const ShowListing = () => {
 
               <div
                 ref={mapContainerRef}
-                className="w-full h-[280px] sm:h-[320px] rounded-xl border border-gray-200 overflow-hidden shadow-inner"
+                className="w-full h-[300px] rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
               />
             </div>
 
-            {/* Reviews Section */}
-            <section className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+            {/* Guest Reviews Section */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-rose-500 fill-rose-500" />
+                  {averageRating ? `${averageRating} · ` : ""}Guest Reviews
+                </h3>
+                <span className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                  {listing.reviews ? listing.reviews.length : 0} reviews
+                </span>
+              </div>
+
+              {/* Leave Review Form */}
               {user && (
-                <div className="mb-8 pb-8 border-b border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Leave a Review
-                  </h3>
+                <div className="mb-8 p-5 bg-slate-50 border border-gray-200 rounded-2xl">
+                  <h4 className="text-sm font-bold text-gray-900 mb-3">
+                    Write a Review
+                  </h4>
 
                   {reviewError && (
                     <div className="p-3 mb-4 bg-rose-50 text-rose-600 rounded-xl text-xs flex items-center gap-2 border border-rose-100">
@@ -426,7 +569,7 @@ const ShowListing = () => {
 
                   <form onSubmit={handleReviewSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                         Rating
                       </label>
                       <div className="flex items-center gap-1">
@@ -437,13 +580,13 @@ const ShowListing = () => {
                             onClick={() => setRating(star)}
                             onMouseEnter={() => setHoverRating(star)}
                             onMouseLeave={() => setHoverRating(0)}
-                            className="p-1 focus:outline-none transition-transform hover:scale-110"
+                            className="p-0.5 focus:outline-none transition-transform hover:scale-110"
                           >
                             <Star
-                              className={`w-6 h-6 ${
+                              className={`w-5 h-5 ${
                                 star <= (hoverRating || rating)
-                                  ? "text-amber-400 fill-amber-400"
-                                  : "text-gray-200"
+                                  ? "text-rose-500 fill-rose-500"
+                                  : "text-gray-300"
                               }`}
                             />
                           </button>
@@ -452,19 +595,12 @@ const ShowListing = () => {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="comment"
-                        className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1"
-                      >
-                        Your Experience
-                      </label>
                       <textarea
-                        id="comment"
                         rows="3"
-                        placeholder="Describe your stay and what future visitors should know..."
+                        placeholder="Share details of your experience..."
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-slate-50/50"
+                        className="w-full p-3 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-white"
                         required
                       />
                     </div>
@@ -472,7 +608,7 @@ const ShowListing = () => {
                     <button
                       type="submit"
                       disabled={submittingReview}
-                      className="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-sm"
+                      className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
                     >
                       {submittingReview ? "Submitting…" : "Post Review"}
                     </button>
@@ -480,98 +616,92 @@ const ShowListing = () => {
                 </div>
               )}
 
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                    Guest Reviews
-                  </h3>
-                  <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">
-                    {listing.reviews ? listing.reviews.length : 0} total
-                  </span>
-                </div>
+              {/* Reviews List */}
+              {listing.reviews && listing.reviews.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {listing.reviews.map((rev) => {
+                    const isReviewAuthor =
+                      user &&
+                      rev.author &&
+                      (user._id === rev.author._id ||
+                        user._id === rev.author);
 
-                {listing.reviews && listing.reviews.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {listing.reviews.map((rev) => {
-                      const isReviewAuthor =
-                        user &&
-                        rev.author &&
-                        (user._id === rev.author._id ||
-                          user._id === rev.author);
+                    const authorName =
+                      rev.author?.username ||
+                      rev.author?.name ||
+                      "Guest";
 
-                      const authorName =
-                        rev.author?.username ||
-                        rev.author?.name ||
-                        "Guest";
-
-                      return (
-                        <div
-                          key={rev._id}
-                          className="bg-slate-50/60 border border-gray-200 rounded-xl p-4 flex flex-col justify-between hover:border-gray-300 transition-all"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-xs">
-                                  {authorName.charAt(0).toUpperCase()}
-                                </div>
-                                <span className="font-semibold text-gray-900 text-xs">
-                                  @{authorName}
-                                </span>
+                    return (
+                      <div
+                        key={rev._id}
+                        className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col justify-between shadow-xs"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xs">
+                                {authorName.charAt(0).toUpperCase()}
                               </div>
-
-                              <div className="flex items-center gap-0.5 text-amber-400 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
-                                <Star className="w-3 h-3 fill-amber-400" />
-                                <span className="text-xs font-bold text-amber-700">
-                                  {rev.rating}.0
-                                </span>
-                              </div>
+                              <span className="font-semibold text-gray-900 text-xs">
+                                {authorName}
+                              </span>
                             </div>
 
-                            <p className="text-gray-600 text-xs leading-relaxed">
-                              {rev.comment}
-                            </p>
+                            <div className="flex items-center gap-0.5 text-rose-500">
+                              <Star className="w-3.5 h-3.5 fill-rose-500" />
+                              <span className="text-xs font-bold text-gray-900 ml-0.5">
+                                {rev.rating}.0
+                              </span>
+                            </div>
                           </div>
 
-                          {isReviewAuthor && (
-                            <div className="mt-4 pt-2.5 border-t border-gray-200/60 flex justify-end">
-                              <button
-                                onClick={() => handleDeleteReview(rev._id)}
-                                className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-xs font-semibold transition-all"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                                Delete
-                              </button>
-                            </div>
-                          )}
+                          <p className="text-gray-600 text-xs leading-relaxed">
+                            {rev.comment}
+                          </p>
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-gray-400 text-xs italic text-center py-4">
-                    No reviews yet for this listing.
-                  </p>
-                )}
-              </div>
-            </section>
+
+                        {isReviewAuthor && (
+                          <div className="mt-3 pt-2 border-t border-gray-100 flex justify-end">
+                            <button
+                              onClick={() => handleDeleteReview(rev._id)}
+                              className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-[11px] font-semibold transition-all"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-xs italic text-center py-4">
+                  No reviews yet for this listing.
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Right Column (1 Col): Sticky Booking / Reservation Form */}
+          {/* Right Column (1 Col): Sticky Booking Card */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xl sticky top-24">
-              <div className="flex items-baseline justify-between mb-6 pb-4 border-b border-gray-100">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xl sticky top-28">
+              <div className="flex items-baseline justify-between mb-6">
                 <div>
-                  <span className="text-2xl font-black text-rose-600">
-                    &#8377;
-                    {Number(listing.price || 0).toLocaleString("en-IN")}
+                  <span className="text-2xl font-extrabold text-gray-900">
+                    ₹{Number(listing.price || 0).toLocaleString("en-IN")}
                   </span>
                   <span className="text-gray-500 text-xs font-semibold">
                     {" "}
                     / night
                   </span>
                 </div>
+                {averageRating && (
+                  <div className="flex items-center gap-1 text-xs font-semibold text-gray-900">
+                    <Star className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+                    {averageRating}
+                  </div>
+                )}
               </div>
 
               {bookingMessage && (
@@ -586,14 +716,14 @@ const ShowListing = () => {
                 </div>
               )}
 
-              {/* Enhanced Unified Date Picker Container */}
-              <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 shadow-sm focus-within:ring-2 focus-within:ring-rose-500/30 transition-all">
+              {/* Unified Date Picker Box */}
+              <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 focus-within:ring-2 focus-within:ring-rose-500 transition-all">
                 <div className="grid grid-cols-2 divide-x divide-gray-200">
                   {/* Check-In */}
-                  <div className="p-3 bg-white hover:bg-slate-50 transition-colors">
-                    <label className="block text-[10px] font-black uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
+                  <div className="p-2.5 bg-white">
+                    <label className="block text-[10px] font-bold uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
                       <CalendarIcon className="w-3 h-3 text-rose-500" />
-                      Check-In
+                      CHECK-IN
                     </label>
                     <DatePicker
                       selected={checkIn}
@@ -609,15 +739,15 @@ const ShowListing = () => {
                       minDate={new Date()}
                       excludeDateIntervals={bookedIntervals}
                       placeholderText="Add date"
-                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                      className="w-full text-xs font-medium text-gray-800 focus:outline-none bg-transparent cursor-pointer"
                     />
                   </div>
 
                   {/* Check-Out */}
-                  <div className="p-3 bg-white hover:bg-slate-50 transition-colors">
-                    <label className="block text-[10px] font-black uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
+                  <div className="p-2.5 bg-white">
+                    <label className="block text-[10px] font-bold uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
                       <CalendarIcon className="w-3 h-3 text-rose-500" />
-                      Check-Out
+                      CHECKOUT
                     </label>
                     <DatePicker
                       selected={checkOut}
@@ -628,7 +758,7 @@ const ShowListing = () => {
                       minDate={checkIn || new Date()}
                       excludeDateIntervals={bookedIntervals}
                       placeholderText="Add date"
-                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                      className="w-full text-xs font-medium text-gray-800 focus:outline-none bg-transparent cursor-pointer"
                     />
                   </div>
                 </div>
@@ -636,14 +766,21 @@ const ShowListing = () => {
 
               {/* Price Calculation Summary */}
               {nights > 0 && (
-                <div className="space-y-2.5 text-xs border-t border-gray-100 pt-4 mb-5">
+                <div className="space-y-3 text-xs border-t border-gray-100 pt-4 mb-5">
                   <div className="flex justify-between text-gray-600">
                     <span>
                       ₹{Number(listing.price).toLocaleString("en-IN")} x{" "}
                       {nights} {nights === 1 ? "night" : "nights"}
                     </span>
                     <span className="font-medium text-gray-900">
-                      ₹{totalPrice.toLocaleString("en-IN")}
+                      ₹{basePrice.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-gray-600">
+                    <span>Staynest service fee</span>
+                    <span className="font-medium text-gray-900">
+                      ₹{serviceFee.toLocaleString("en-IN")}
                     </span>
                   </div>
 
@@ -669,9 +806,26 @@ const ShowListing = () => {
               </p>
             </div>
           </div>
-
         </div>
       </main>
+
+      {/* Fullscreen Photo Modal */}
+      {showGalleryModal && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <button
+            onClick={() => setShowGalleryModal(false)}
+            className="absolute top-6 right-6 text-white hover:text-gray-300 p-2 bg-white/10 rounded-full"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={imageUrl}
+            alt={listing.title}
+            className="max-w-full max-h-[85vh] object-contain rounded-lg"
+          />
+        </div>
+      )}
+
     </div>
   );
 };
