@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import API from "../api/axios";
 
 const Login = () => {
@@ -13,7 +14,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 1. Defined inside the component scope
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -26,7 +26,6 @@ const Login = () => {
     try {
       const res = await API.post("/auth/login", formData);
 
-      // Extract token and user object dynamically
       const token = res.data.token || res.data.data?.token;
       const user = res.data.user || res.data.data?.user || res.data;
 
@@ -46,65 +45,71 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm bg-white space-y-6">
-        <h2 className="text-2xl font-bold text-center text-gray-900">
-          Log In to StayNest
-        </h2>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* 1. Render Navbar here */}
+      <Navbar />
 
-        {error && (
-          <div className="p-3 bg-red-100 border border-red-300 text-red-700 text-sm rounded-lg text-center">
-            {error}
-          </div>
-        )}
+      {/* 2. Login Form Container */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="max-w-md w-full border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm bg-white space-y-6">
+          <h2 className="text-2xl font-bold text-center text-gray-900">
+            Log In to StayNest
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-800">
-              Email Address
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
-            />
-          </div>
+          {error && (
+            <div className="p-3 bg-red-100 border border-red-300 text-red-700 text-sm rounded-lg text-center">
+              {error}
+            </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-semibold mb-1 text-gray-800">
-              Password
-            </label>
-            <input
-              name="password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold mb-1 text-gray-800">
+                Email Address
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-xl text-sm transition shadow-sm disabled:opacity-50 cursor-pointer"
-          >
-            {loading ? "Logging in..." : "Log In"}
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm font-semibold mb-1 text-gray-800">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
+              />
+            </div>
 
-        <p className="text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-rose-500 font-semibold hover:underline">
-            Sign Up
-          </Link>
-        </p>
-      </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-xl text-sm transition shadow-sm disabled:opacity-50 cursor-pointer"
+            >
+              {loading ? "Logging in..." : "Log In"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-rose-500 font-semibold hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </div>
+      </main>
     </div>
   );
 };

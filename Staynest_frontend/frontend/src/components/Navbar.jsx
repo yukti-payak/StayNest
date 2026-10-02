@@ -16,17 +16,23 @@ const Navbar = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const handleLogout = async () => {
-    try {
-      await API.post("/auth/logout");
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      setIsMobileMenuOpen(false);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+const handleLogout = async () => {
+  try {
+    await API.post("/auth/logout");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsMobileMenuOpen(false);
+    
+    // Redirect to All Listings page
+    navigate("/");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    // Even if backend logout fails, clear local credentials and go home
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  }
+};
 
   const handleSearch = (e) => {
     e.preventDefault();

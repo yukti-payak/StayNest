@@ -13,20 +13,8 @@ import {
   Star,
   Trash2,
   Edit,
-  ShieldCheck,
   Calendar as CalendarIcon,
-  Wifi,
-  Car,
-  Utensils,
-  Laptop,
-  Tv,
-  Wind,
-  Share2,
-  Heart,
-  Grid,
   X,
-  Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 
 const ShowListing = () => {
@@ -41,7 +29,6 @@ const ShowListing = () => {
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
 
   // Booking State
   const [checkIn, setCheckIn] = useState(null);
@@ -164,21 +151,18 @@ const ShowListing = () => {
       zoom: 13,
     });
 
-    mapRef.current.addControl(
-      new mapboxgl.NavigationControl(),
-      "top-right"
-    );
+    mapRef.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     new mapboxgl.Marker({ color: "#e11d48" })
       .setLngLat(coordinates)
       .setPopup(
         new mapboxgl.Popup({ offset: 25 }).setHTML(
-          `<div style="padding: 6px;">
-            <h4 style="font-weight:700;margin-bottom:2px;font-size:13px;">
+          `<div style="padding: 4px;">
+            <h4 style="font-weight:700;margin-bottom:2px;font-size:12px;">
               ${listing.title}
             </h4>
-            <p style="font-size:11px;color:#666;margin:0;">
-              Exact location provided after booking confirmation
+            <p style="font-size:10px;color:#666;margin:0;">
+              Exact location provided after booking
             </p>
           </div>`
         )
@@ -200,9 +184,7 @@ const ShowListing = () => {
       await API.delete(`/listings/${id}`);
       navigate("/");
     } catch (err) {
-      alert(
-        err.response?.data?.message || "Failed to delete listing."
-      );
+      alert(err.response?.data?.message || "Failed to delete listing.");
     } finally {
       setDeleting(false);
     }
@@ -261,9 +243,7 @@ const ShowListing = () => {
         reviews: prev.reviews.filter((rev) => rev._id !== reviewId),
       }));
     } catch (err) {
-      alert(
-        err.response?.data?.message || "Failed to delete review."
-      );
+      alert(err.response?.data?.message || "Failed to delete review.");
     }
   };
 
@@ -272,8 +252,8 @@ const ShowListing = () => {
       <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-3">
-          <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 text-sm font-medium">
+          <div className="w-8 h-8 border-3 border-rose-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-500 text-xs font-medium">
             Loading stay details…
           </p>
         </div>
@@ -286,17 +266,17 @@ const ShowListing = () => {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <Navbar />
-        <div className="flex-1 max-w-md mx-auto my-24 px-6 text-center">
-          <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
-            <AlertCircle className="w-7 h-7" />
+        <div className="flex-1 max-w-md mx-auto my-20 px-6 text-center">
+          <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-rose-100">
+            <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">
             Listing Unavailable
           </h2>
-          <p className="text-gray-600 text-sm mb-6">{error}</p>
+          <p className="text-gray-600 text-xs mb-5">{error}</p>
           <Link
             to="/"
-            className="inline-flex items-center justify-center bg-rose-500 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-rose-600 transition-all shadow-md hover:shadow-rose-200"
+            className="inline-flex items-center justify-center bg-rose-500 text-white px-5 py-2 rounded-xl font-semibold text-xs hover:bg-rose-600 transition-all shadow-sm"
           >
             Back to Explore
           </Link>
@@ -336,369 +316,87 @@ const ShowListing = () => {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 py-6 w-full">
-        {/* Title Header */}
-        <div className="mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-2">
+      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 py-6 w-full">
+        {/* Title Header with Host Actions */}
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             {listing.title}
           </h1>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <div className="flex items-center gap-4 flex-wrap text-gray-700">
-              {averageRating && (
-                <span className="flex items-center gap-1 font-semibold text-gray-900">
-                  <Star className="w-4 h-4 fill-rose-500 text-rose-500" />
-                  {averageRating}
-                  <span className="text-gray-500 font-normal underline">
-                    ({listing.reviews.length} reviews)
-                  </span>
-                </span>
-              )}
-              <span className="flex items-center gap-1 font-medium text-gray-700 underline cursor-pointer">
-                <MapPin className="w-4 h-4 text-rose-500" />
-                {listing.location}, {listing.country}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsSaved(!isSaved)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-700 text-xs font-semibold transition-all border border-gray-200"
+          {isOwner && (
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to={`/listings/${id}/edit`}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg text-xs transition-all"
               >
-                <Heart
-                  className={`w-3.5 h-3.5 ${
-                    isSaved ? "fill-rose-500 text-rose-500" : ""
-                  }`}
-                />
-                {isSaved ? "Saved" : "Save"}
+                <Edit className="w-3 h-3" />
+                Edit
+              </Link>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-lg text-xs transition-all disabled:opacity-50"
+              >
+                <Trash2 className="w-3 h-3" />
+                {deleting ? "Deleting…" : "Delete"}
               </button>
-
-              {isOwner && (
-                <div className="flex items-center gap-2 ml-2">
-                  <Link
-                    to={`/listings/${id}/edit`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg text-xs transition-all"
-                  >
-                    <Edit className="w-3.5 h-3.5" />
-                    Edit
-                  </Link>
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-lg text-xs transition-all disabled:opacity-50"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    {deleting ? "Deleting…" : "Delete"}
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Hero Multi-Photo Gallery Grid */}
-        <div className="relative rounded-2xl overflow-hidden mb-8 shadow-sm group">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[340px] sm:h-[420px]">
-            <div className="md:col-span-2 h-full overflow-hidden">
+        {/* 2-Column Main Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
+          {/* Left Column: Container for Image & Description */}
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="w-full h-[300px] sm:h-[360px] overflow-hidden bg-gray-100 relative">
               <img
                 src={imageUrl}
                 alt={listing.title}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer"
+                className="w-full h-full object-cover cursor-pointer hover:scale-102 transition-transform duration-300"
                 onClick={() => setShowGalleryModal(true)}
               />
             </div>
-            <div className="hidden md:grid md:col-span-2 grid-cols-2 gap-2 h-full">
-              <div className="overflow-hidden h-full">
-                <img
-                  src={imageUrl}
-                  alt={listing.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer brightness-95"
-                  onClick={() => setShowGalleryModal(true)}
-                />
-              </div>
-              <div className="overflow-hidden h-full">
-                <img
-                  src={imageUrl}
-                  alt={listing.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500 cursor-pointer brightness-90"
-                  onClick={() => setShowGalleryModal(true)}
-                />
-              </div>
-            </div>
-          </div>
 
-          <button
-            onClick={() => setShowGalleryModal(true)}
-            className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-gray-900 border border-gray-300 font-medium text-xs px-3.5 py-2 rounded-xl backdrop-blur-md shadow-md flex items-center gap-2 transition-all"
-          >
-            <Grid className="w-3.5 h-3.5" />
-            Show all photos
-          </button>
-        </div>
+            <div className="p-4 sm:p-5 space-y-4">
+              <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-gray-900">
+                    Stay hosted by {ownerName}
+                  </h2>
+                  <p className="text-[11px] text-gray-500 font-medium">
+                    {listing.location}, {listing.country}
+                  </p>
+                </div>
+                <div className="w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">
+                  {ownerName.charAt(0).toUpperCase()}
+                </div>
+              </div>
 
-        {/* Main Content Side-by-Side Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
-          {/* Left Column (2 Cols): Host, Features, Description, Amenities, Map, Reviews */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Host Section */}
-            <div className="pb-6 border-b border-gray-200 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">
-                  Entire stay hosted by {ownerName}
-                </h2>
-                <p className="text-xs text-gray-500 font-medium">
-                  2 guests · 1 bedroom · 1 bed · 1 bath
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
-                {ownerName.charAt(0).toUpperCase()}
-              </div>
-            </div>
-
-            {/* Highlights */}
-            <div className="space-y-4 pb-6 border-b border-gray-200">
-              <div className="flex items-start gap-4">
-                <Sparkles className="w-5 h-5 text-rose-500 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">
-                    Experienced Host
-                  </h4>
-                  <p className="text-xs text-gray-500">
-                    {ownerName} has great reviews from verified stays.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-5 h-5 text-rose-500 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">
-                    Great Location
-                  </h4>
-                  <p className="text-xs text-gray-500">
-                    95% of recent guests gave the location a 5-star rating.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="pb-8 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">
-                About this space
-              </h3>
-              <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
-                {listing.description}
-              </p>
-            </div>
-
-            {/* Amenities Grid */}
-            <div className="pb-8 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                What this place offers
-              </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div className="flex items-center gap-3">
-                  <Wifi className="w-4 h-4 text-gray-600" />
-                  <span>Fast Wi-Fi</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Car className="w-4 h-4 text-gray-600" />
-                  <span>Free driveway parking</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Utensils className="w-4 h-4 text-gray-600" />
-                  <span>Fully equipped kitchen</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Laptop className="w-4 h-4 text-gray-600" />
-                  <span>Dedicated workspace</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Tv className="w-4 h-4 text-gray-600" />
-                  <span>55" HDTV with Netflix</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Wind className="w-4 h-4 text-gray-600" />
-                  <span>Air conditioning</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Map Section */}
-            <div className="pb-8 border-b border-gray-200">
-              <div className="mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Where you'll be
+                <h3 className="text-sm font-bold text-gray-900 mb-1.5">
+                  About this space
                 </h3>
-                <p className="text-gray-500 text-xs mt-0.5">
-                  {listing.location}, {listing.country}
+                <p className="text-gray-600 leading-relaxed text-xs whitespace-pre-line">
+                  {listing.description}
                 </p>
               </div>
-
-              <div
-                ref={mapContainerRef}
-                className="w-full h-[300px] rounded-2xl border border-gray-200 overflow-hidden shadow-sm"
-              />
-            </div>
-
-            {/* Guest Reviews Section */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-rose-500 fill-rose-500" />
-                  {averageRating ? `${averageRating} · ` : ""}Guest Reviews
-                </h3>
-                <span className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
-                  {listing.reviews ? listing.reviews.length : 0} reviews
-                </span>
-              </div>
-
-              {/* Leave Review Form */}
-              {user && (
-                <div className="mb-8 p-5 bg-slate-50 border border-gray-200 rounded-2xl">
-                  <h4 className="text-sm font-bold text-gray-900 mb-3">
-                    Write a Review
-                  </h4>
-
-                  {reviewError && (
-                    <div className="p-3 mb-4 bg-rose-50 text-rose-600 rounded-xl text-xs flex items-center gap-2 border border-rose-100">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      {reviewError}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleReviewSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
-                        Rating
-                      </label>
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            type="button"
-                            key={star}
-                            onClick={() => setRating(star)}
-                            onMouseEnter={() => setHoverRating(star)}
-                            onMouseLeave={() => setHoverRating(0)}
-                            className="p-0.5 focus:outline-none transition-transform hover:scale-110"
-                          >
-                            <Star
-                              className={`w-5 h-5 ${
-                                star <= (hoverRating || rating)
-                                  ? "text-rose-500 fill-rose-500"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <textarea
-                        rows="3"
-                        placeholder="Share details of your experience..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-white"
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={submittingReview}
-                      className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-                    >
-                      {submittingReview ? "Submitting…" : "Post Review"}
-                    </button>
-                  </form>
-                </div>
-              )}
-
-              {/* Reviews List */}
-              {listing.reviews && listing.reviews.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {listing.reviews.map((rev) => {
-                    const isReviewAuthor =
-                      user &&
-                      rev.author &&
-                      (user._id === rev.author._id ||
-                        user._id === rev.author);
-
-                    const authorName =
-                      rev.author?.username ||
-                      rev.author?.name ||
-                      "Guest";
-
-                    return (
-                      <div
-                        key={rev._id}
-                        className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-col justify-between shadow-xs"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xs">
-                                {authorName.charAt(0).toUpperCase()}
-                              </div>
-                              <span className="font-semibold text-gray-900 text-xs">
-                                {authorName}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-0.5 text-rose-500">
-                              <Star className="w-3.5 h-3.5 fill-rose-500" />
-                              <span className="text-xs font-bold text-gray-900 ml-0.5">
-                                {rev.rating}.0
-                              </span>
-                            </div>
-                          </div>
-
-                          <p className="text-gray-600 text-xs leading-relaxed">
-                            {rev.comment}
-                          </p>
-                        </div>
-
-                        {isReviewAuthor && (
-                          <div className="mt-3 pt-2 border-t border-gray-100 flex justify-end">
-                            <button
-                              onClick={() => handleDeleteReview(rev._id)}
-                              className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-[11px] font-semibold transition-all"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-xs italic text-center py-4">
-                  No reviews yet for this listing.
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Right Column (1 Col): Sticky Booking Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xl sticky top-28">
-              <div className="flex items-baseline justify-between mb-6">
+          {/* Right Column: Reservation Card */}
+          <div className="lg:col-span-1 sticky top-20">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-lg">
+              {/* Header Price Section */}
+              <div className="flex items-baseline justify-between mb-4">
                 <div>
-                  <span className="text-2xl font-extrabold text-gray-900">
+                  <span className="text-2xl font-black text-gray-900">
                     ₹{Number(listing.price || 0).toLocaleString("en-IN")}
                   </span>
-                  <span className="text-gray-500 text-xs font-semibold">
-                    {" "}
-                    / night
-                  </span>
+                  <span className="text-gray-500 text-xs font-medium"> / night</span>
                 </div>
                 {averageRating && (
-                  <div className="flex items-center gap-1 text-xs font-semibold text-gray-900">
-                    <Star className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
+                  <div className="flex items-center gap-1 text-xs font-bold text-gray-900">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     {averageRating}
                   </div>
                 )}
@@ -706,23 +404,23 @@ const ShowListing = () => {
 
               {bookingMessage && (
                 <div
-                  className={`mb-4 text-xs font-semibold p-3 rounded-xl ${
+                  className={`mb-3 text-[11px] font-semibold p-2.5 rounded-lg ${
                     bookingMessage.includes("successful")
-                      ? "text-emerald-600 bg-emerald-50 border border-emerald-100"
-                      : "text-rose-600 bg-rose-50 border border-rose-100"
+                      ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
+                      : "text-rose-700 bg-rose-50 border border-rose-200"
                   }`}
                 >
                   {bookingMessage}
                 </div>
               )}
 
-              {/* Unified Date Picker Box */}
-              <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 focus-within:ring-2 focus-within:ring-rose-500 transition-all">
+              {/* Date Selection Grid */}
+              <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 focus-within:ring-2 focus-within:ring-rose-500 transition-all bg-white">
                 <div className="grid grid-cols-2 divide-x divide-gray-200">
                   {/* Check-In */}
-                  <div className="p-2.5 bg-white">
-                    <label className="block text-[10px] font-bold uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
-                      <CalendarIcon className="w-3 h-3 text-rose-500" />
+                  <div className="p-2.5">
+                    <label className="block text-[9px] font-bold uppercase text-gray-500 tracking-wider mb-0.5 flex items-center gap-1">
+                      <CalendarIcon className="w-2.5 h-2.5 text-rose-500" />
                       CHECK-IN
                     </label>
                     <DatePicker
@@ -739,14 +437,14 @@ const ShowListing = () => {
                       minDate={new Date()}
                       excludeDateIntervals={bookedIntervals}
                       placeholderText="Add date"
-                      className="w-full text-xs font-medium text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
                     />
                   </div>
 
                   {/* Check-Out */}
-                  <div className="p-2.5 bg-white">
-                    <label className="block text-[10px] font-bold uppercase text-gray-500 tracking-wider mb-1 flex items-center gap-1">
-                      <CalendarIcon className="w-3 h-3 text-rose-500" />
+                  <div className="p-2.5">
+                    <label className="block text-[9px] font-bold uppercase text-gray-500 tracking-wider mb-0.5 flex items-center gap-1">
+                      <CalendarIcon className="w-2.5 h-2.5 text-rose-500" />
                       CHECKOUT
                     </label>
                     <DatePicker
@@ -758,65 +456,229 @@ const ShowListing = () => {
                       minDate={checkIn || new Date()}
                       excludeDateIntervals={bookedIntervals}
                       placeholderText="Add date"
-                      className="w-full text-xs font-medium text-gray-800 focus:outline-none bg-transparent cursor-pointer"
+                      className="w-full text-xs font-semibold text-gray-800 focus:outline-none bg-transparent cursor-pointer"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Price Calculation Summary */}
+              {/* Price Breakdown */}
               {nights > 0 && (
-                <div className="space-y-3 text-xs border-t border-gray-100 pt-4 mb-5">
+                <div className="space-y-2 text-[11px] border-t border-gray-100 pt-3 mb-4">
                   <div className="flex justify-between text-gray-600">
                     <span>
-                      ₹{Number(listing.price).toLocaleString("en-IN")} x{" "}
-                      {nights} {nights === 1 ? "night" : "nights"}
+                      ₹{Number(listing.price).toLocaleString("en-IN")} x {nights}{" "}
+                      {nights === 1 ? "night" : "nights"}
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-semibold text-gray-900">
                       ₹{basePrice.toLocaleString("en-IN")}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-gray-600">
-                    <span>Staynest service fee</span>
-                    <span className="font-medium text-gray-900">
+                    <span>Service fee</span>
+                    <span className="font-semibold text-gray-900">
                       ₹{serviceFee.toLocaleString("en-IN")}
                     </span>
                   </div>
 
-                  <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-100 pt-3">
-                    <span>Total before taxes</span>
-                    <span className="text-rose-600 font-extrabold">
+                  <div className="flex justify-between font-bold text-xs text-gray-900 border-t border-gray-100 pt-2">
+                    <span>Total</span>
+                    <span className="text-rose-600 font-black">
                       ₹{totalPrice.toLocaleString("en-IN")}
                     </span>
                   </div>
                 </div>
               )}
 
+              {/* Reserve Button */}
               <button
+                type="button"
                 onClick={handleBooking}
-                disabled={bookingLoading || nights <= 0}
-                className="w-full py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-xl transition-all shadow-md hover:shadow-rose-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                disabled={bookingLoading}
+                className="w-full py-3 px-4 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold text-sm rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-75 cursor-pointer flex items-center justify-center gap-2"
               >
-                {bookingLoading ? "Processing..." : "Reserve Stay"}
+                {bookingLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <span>Reserve Stay</span>
+                )}
               </button>
 
-              <p className="text-[11px] text-gray-400 text-center mt-3">
+              <p className="text-[10px] text-gray-400 text-center mt-2.5 font-medium">
                 You won't be charged until the next step.
               </p>
             </div>
           </div>
         </div>
+
+        {/* Compact Map Section */}
+        <div className="mb-8 border-t border-gray-200 pt-5">
+          <div className="mb-2.5">
+            <h3 className="text-base font-bold text-gray-900">Where you'll be</h3>
+            <p className="text-gray-500 text-[11px] mt-0.5">
+              {listing.location}, {listing.country}
+            </p>
+          </div>
+
+          <div
+            ref={mapContainerRef}
+            className="w-full sm:w-[70%] max-w-2xl h-[340px] rounded-2xl border border-gray-200 overflow-hidden shadow-xs"
+          />
+        </div>
+
+        {/* Reviews Section */}
+        <div className="border-t border-gray-200 pt-6 mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+              {averageRating ? `${averageRating} · ` : ""}Guest Reviews
+            </h3>
+            <span className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+              {listing.reviews ? listing.reviews.length : 0} reviews
+            </span>
+          </div>
+
+          {/* Larger Add Review Form */}
+          {user && (
+            <div className="mb-8 p-6 bg-slate-50 border border-gray-200 rounded-2xl shadow-xs">
+              <h4 className="text-sm font-bold text-gray-900 mb-3">
+                Leave a Review
+              </h4>
+
+              {reviewError && (
+                <div className="p-3 mb-4 bg-rose-50 text-rose-600 rounded-xl text-xs flex items-center gap-2 border border-rose-100">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {reviewError}
+                </div>
+              )}
+
+              <form onSubmit={handleReviewSubmit} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                    Rating:
+                  </label>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        className="p-1 focus:outline-none transition-transform hover:scale-110"
+                      >
+                        <Star
+                          className={`w-5 h-5 ${
+                            star <= (hoverRating || rating)
+                              ? "text-amber-400 fill-amber-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <textarea
+                    rows="4"
+                    placeholder="Share details of your stay..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="w-full p-3.5 border border-gray-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-white"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-xs cursor-pointer"
+                >
+                  {submittingReview ? "Submitting…" : "Post Review"}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Comments Section: 2 Columns Grid (2 per line) with Smaller Cards */}
+          {listing.reviews && listing.reviews.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl">
+              {listing.reviews.map((rev) => {
+                const isReviewAuthor =
+                  user &&
+                  rev.author &&
+                  (user._id === rev.author._id || user._id === rev.author);
+
+                const authorName =
+                  rev.author?.username ||
+                  rev.author?.name ||
+                  "Guest";
+
+                return (
+                  <div
+                    key={rev._id}
+                    className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col justify-between shadow-2xs hover:border-gray-300 transition-all"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-[9px]">
+                            {authorName.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-semibold text-gray-900 text-[11px]">
+                            {authorName}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-0.5 text-amber-400">
+                          <Star className="w-3 h-3 fill-amber-400" />
+                          <span className="text-[10px] font-bold text-gray-900 ml-0.5">
+                            {rev.rating}.0
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-600 text-[11px] leading-snug">
+                        {rev.comment}
+                      </p>
+                    </div>
+
+                    {isReviewAuthor && (
+                      <div className="mt-2 pt-1.5 border-t border-gray-100 flex justify-end">
+                        <button
+                          onClick={() => handleDeleteReview(rev._id)}
+                          className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-[10px] font-semibold transition-all"
+                        >
+                          <Trash2 className="w-2.5 h-2.5" />
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-xs italic py-2">
+              No reviews yet for this listing.
+            </p>
+          )}
+        </div>
       </main>
 
-      {/* Fullscreen Photo Modal */}
+      {/* Fullscreen Image View Modal */}
       {showGalleryModal && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <button
             onClick={() => setShowGalleryModal(false)}
-            className="absolute top-6 right-6 text-white hover:text-gray-300 p-2 bg-white/10 rounded-full"
+            className="absolute top-5 right-5 text-white hover:text-gray-300 p-2 bg-white/10 rounded-full"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
           <img
             src={imageUrl}
