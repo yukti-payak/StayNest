@@ -264,7 +264,7 @@ const ShowListing = () => {
 
   if (error || !listing) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 max-w-md mx-auto my-20 px-6 text-center">
           <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-rose-100">
@@ -327,7 +327,7 @@ const ShowListing = () => {
             <div className="flex items-center gap-2 shrink-0">
               <Link
                 to={`/listings/${id}/edit`}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg text-xs transition-all"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg text-xs transition-all shadow-xs"
               >
                 <Edit className="w-3 h-3" />
                 Edit
@@ -335,7 +335,7 @@ const ShowListing = () => {
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium rounded-lg text-xs transition-all disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg text-xs transition-all shadow-xs disabled:opacity-50"
               >
                 <Trash2 className="w-3 h-3" />
                 {deleting ? "Deleting…" : "Delete"}
@@ -367,7 +367,7 @@ const ShowListing = () => {
                     {listing.location}, {listing.country}
                   </p>
                 </div>
-                <div className="w-9 h-9 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">
+                <div className="w-9 h-9 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">
                   {ownerName.charAt(0).toUpperCase()}
                 </div>
               </div>
@@ -537,12 +537,12 @@ const ShowListing = () => {
               <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
               {averageRating ? `${averageRating} · ` : ""}Guest Reviews
             </h3>
-            <span className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+            <span className="text-xs font-semibold px-3 py-1 bg-rose-50 text-rose-600 border border-rose-100 rounded-full">
               {listing.reviews ? listing.reviews.length : 0} reviews
             </span>
           </div>
 
-          {/* Larger Add Review Form */}
+          {/* Add Review Form */}
           {user && (
             <div className="mb-8 p-6 bg-slate-50 border border-gray-200 rounded-2xl shadow-xs">
               <h4 className="text-sm font-bold text-gray-900 mb-3">
@@ -597,7 +597,7 @@ const ShowListing = () => {
                 <button
                   type="submit"
                   disabled={submittingReview}
-                  className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-xs cursor-pointer"
+                  className="px-5 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shadow-xs cursor-pointer"
                 >
                   {submittingReview ? "Submitting…" : "Post Review"}
                 </button>
@@ -605,7 +605,7 @@ const ShowListing = () => {
             </div>
           )}
 
-          {/* Comments Section: 2 Columns Grid (2 per line) with Smaller Cards */}
+          {/* Comments Section */}
           {listing.reviews && listing.reviews.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl">
               {listing.reviews.map((rev) => {
@@ -622,12 +622,12 @@ const ShowListing = () => {
                 return (
                   <div
                     key={rev._id}
-                    className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col justify-between shadow-2xs hover:border-gray-300 transition-all"
+                    className="bg-white border border-gray-200 rounded-xl p-3 flex flex-col justify-between shadow-2xs hover:border-rose-200 transition-all"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
-                          <div className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-[9px]">
+                          <div className="w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold text-[9px]">
                             {authorName.charAt(0).toUpperCase()}
                           </div>
                           <span className="font-semibold text-gray-900 text-[11px]">
@@ -687,7 +687,6 @@ const ShowListing = () => {
           />
         </div>
       )}
-
     </div>
   );
 };

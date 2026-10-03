@@ -4,3 +4,32 @@
 @theme {
   --font-sans: 'Inter', sans-serif;
 }
+
+
+
+/* Custom React Datepicker overrides to match Rose Theme */
+.react-datepicker {
+  font-family: inherit;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.react-datepicker__header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__day--in-range {
+  background-color: #f43f5e !important;
+  color: #ffffff !important;
+  border-radius: 0.5rem;
+}
+
+.react-datepicker__day--in-selecting-range {
+  background-color: #fecdd3 !important;
+  color: #9f1239 !important;
+}

@@ -75,7 +75,7 @@ const NewListing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 text-gray-900 flex flex-col font-sans">
+    <div className="min-h-screen  text-gray-900 flex flex-col font-sans">
       <Navbar />
 
       <main className="flex-1 max-w-2xl mx-auto px-4 py-6 w-full">
