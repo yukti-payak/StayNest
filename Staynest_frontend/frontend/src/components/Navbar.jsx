@@ -8,7 +8,9 @@ const Navbar = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("query") || "");
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("query") || ""
+  );
 
   useEffect(() => {
     setSearchTerm(searchParams.get("query") || "");
@@ -16,26 +18,28 @@ const Navbar = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-const handleLogout = async () => {
-  try {
-    await API.post("/auth/logout");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsMobileMenuOpen(false);
-    
-    // Redirect to All Listings page
-    navigate("/");
-  } catch (error) {
-    console.error("Logout failed:", error);
-    // Even if backend logout fails, clear local credentials and go home
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  }
-};
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout");
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      setIsMobileMenuOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      navigate("/");
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+
     const queryParams = new URLSearchParams(searchParams);
 
     if (searchTerm.trim()) {
@@ -49,57 +53,134 @@ const handleLogout = async () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
-        
-        {/* Brand Logo */}
-        <Link to="/" className="flex items-center shrink-0 cursor-pointer">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-5">
+
+        {/* ================= LOGO ================= */}
+        <Link
+          to="/"
+          className="flex items-center shrink-0 cursor-pointer"
+        >
           <img
-            src="/logo.png" 
-            alt="StayNest Logo" 
-            className="h-12 sm:h-16 w-auto object-contain max-w-[180px] sm:max-w-[220px]"
+            src="/logo.png"
+            alt="StayNest Logo"
+            className="h-11 sm:h-14 w-auto object-contain max-w-[170px] sm:max-w-[210px]"
           />
         </Link>
 
-        {/* Center Search Bar */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4">
-          <div className="flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition overflow-hidden bg-white">
+        {/* ================= SEARCH BAR ================= */}
+        <form
+          onSubmit={handleSearch}
+          className="flex-1 max-w-[500px] mx-1 sm:mx-3"
+        >
+          <div
+            className="
+              flex items-center
+              w-full
+              h-11 sm:h-12
+              bg-white
+              border border-gray-300
+              rounded-full
+              shadow-sm
+              overflow-hidden
+              transition-all duration-200
+              focus-within:border-gray-400
+              focus-within:shadow-md
+              hover:shadow-md
+            "
+          >
+            {/* Input */}
             <input
               type="text"
               placeholder="Search destinations, title, location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm outline-none text-gray-700 bg-transparent placeholder-gray-400"
+              className="
+                flex-1
+                min-w-0
+                h-full
+                px-4 sm:px-5
+                text-sm
+                text-gray-700
+                placeholder-gray-400
+                bg-transparent
+                outline-none
+              "
             />
+
+            {/* Search Button */}
             <button
               type="submit"
-              className="bg-rose-500 hover:bg-rose-600 text-white px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-1.5 font-medium text-xs sm:text-sm transition shrink-0 rounded-r-full cursor-pointer"
+              aria-label="Search"
+              className="
+                flex
+                items-center
+                justify-center
+                shrink-0
+                h-9 w-9
+                sm:h-10 sm:w-10
+                mr-1
+                rounded-full
+                bg-rose-500
+                hover:bg-rose-600
+                active:bg-rose-700
+                text-white
+                transition-all duration-200
+                cursor-pointer
+                shadow-sm
+              "
             >
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Search</span>
+              <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
             </button>
           </div>
         </form>
 
-        {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-700 shrink-0">
-          <Link to="/listings/new" className="hover:text-rose-500 transition cursor-pointer">
+        {/* ================= DESKTOP NAVIGATION ================= */}
+        <div className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium text-gray-700 shrink-0">
+
+          {/* Add Listing */}
+          <Link
+            to="/listings/new"
+            className="hover:text-rose-500 transition-colors cursor-pointer whitespace-nowrap"
+          >
             Add new listing
           </Link>
 
-          {/* WISHLIST LINK */}
-          <Link to="/wishlist" className="hover:text-rose-500 transition cursor-pointer flex items-center gap-1">
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
+            className="
+              flex items-center gap-1.5
+              hover:text-rose-500
+              transition-colors
+              cursor-pointer
+              whitespace-nowrap
+            "
+          >
             <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
             <span>Wishlist</span>
           </Link>
 
+          {/* User */}
           {user ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-900 font-semibold">
+            <div className="flex items-center gap-4">
+              <span className="text-gray-900 font-semibold whitespace-nowrap">
                 Hi, {user.name}
               </span>
+
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white px-3.5 py-1.5 rounded-lg transition text-sm cursor-pointer"
+                className="
+                  flex items-center gap-1.5
+                  bg-rose-500
+                  hover:bg-rose-600
+                  text-white
+                  px-3.5 py-2
+                  rounded-lg
+                  transition-colors
+                  text-sm
+                  cursor-pointer
+                  whitespace-nowrap
+                "
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -107,34 +188,72 @@ const handleLogout = async () => {
             </div>
           ) : (
             <>
-              <Link to="/signup" className="hover:text-rose-500 transition cursor-pointer">
+              <Link
+                to="/signup"
+                className="hover:text-rose-500 transition-colors cursor-pointer"
+              >
                 Sign Up
               </Link>
-              <Link to="/login" className="hover:text-rose-500 transition cursor-pointer">
+
+              <Link
+                to="/login"
+                className="hover:text-rose-500 transition-colors cursor-pointer"
+              >
                 Log in
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
+        {/* ================= MOBILE MENU BUTTON ================= */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none cursor-pointer"
+            className="
+              p-2
+              text-gray-600
+              hover:text-gray-900
+              focus:outline-none
+              cursor-pointer
+            "
+            aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* ================= MOBILE MENU ================= */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 pt-2 pb-4 space-y-3 shadow-lg">
+        <div
+          className="
+            md:hidden
+            border-t border-gray-100
+            bg-white
+            px-4
+            pt-2
+            pb-4
+            space-y-3
+            shadow-lg
+          "
+        >
           <Link
             to="/listings/new"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+            className="
+              block w-full
+              text-left
+              py-2
+              text-sm
+              font-medium
+              text-gray-700
+              hover:text-rose-500
+              transition
+            "
           >
             Add new listing
           </Link>
@@ -142,7 +261,17 @@ const handleLogout = async () => {
           <Link
             to="/wishlist"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="flex items-center gap-2 w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+            className="
+              flex items-center gap-2
+              w-full
+              text-left
+              py-2
+              text-sm
+              font-medium
+              text-gray-700
+              hover:text-rose-500
+              transition
+            "
           >
             <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
             <span>Wishlist</span>
@@ -153,9 +282,21 @@ const handleLogout = async () => {
               <div className="py-1 text-sm font-semibold text-gray-900">
                 Hi, {user.name}
               </div>
+
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 w-full text-left py-2 text-sm font-medium text-rose-500 hover:text-rose-600 transition cursor-pointer"
+                className="
+                  flex items-center gap-2
+                  w-full
+                  text-left
+                  py-2
+                  text-sm
+                  font-medium
+                  text-rose-500
+                  hover:text-rose-600
+                  transition
+                  cursor-pointer
+                "
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -166,14 +307,33 @@ const handleLogout = async () => {
               <Link
                 to="/signup"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+                className="
+                  block w-full
+                  text-left
+                  py-2
+                  text-sm
+                  font-medium
+                  text-gray-700
+                  hover:text-rose-500
+                  transition
+                "
               >
                 Sign Up
               </Link>
+
               <Link
                 to="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-left py-2 text-sm font-medium text-gray-700 hover:text-rose-500 transition"
+                className="
+                  block w-full
+                  text-left
+                  py-2
+                  text-sm
+                  font-medium
+                  text-gray-700
+                  hover:text-rose-500
+                  transition
+                "
               >
                 Log in
               </Link>
