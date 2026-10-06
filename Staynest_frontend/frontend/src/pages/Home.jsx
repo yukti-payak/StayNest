@@ -62,7 +62,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen  text-gray-900">
+    <div className="min-h-screen text-gray-900">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -87,23 +87,6 @@ const Home = () => {
             );
           })}
         </div>
-
-        {/* Active Search / Filter Badge */}
-        {(currentQuery || currentCategory) && (
-          <div className="flex items-center justify-between mb-6 bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
-            <p className="text-gray-600 text-sm">
-              Showing results for:{" "}
-              {currentQuery && <span className="font-bold text-gray-900">"{currentQuery}" </span>}
-              {currentCategory && <span className="font-bold text-gray-900">in {currentCategory}</span>}
-            </p>
-            <button
-              onClick={() => setSearchParams({})}
-              className="text-xs text-rose-500 hover:underline font-semibold cursor-pointer"
-            >
-              Clear Filters
-            </button>
-          </div>
-        )}
 
         {/* Loading State */}
         {loading && (
