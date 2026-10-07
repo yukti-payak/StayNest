@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Menu, X, LogOut, Heart } from "lucide-react";
+import { Search, Menu, X, LogOut, Heart, Calendar } from "lucide-react";
 import API from "../api/axios";
 
 const Navbar = () => {
@@ -160,6 +160,23 @@ const Navbar = () => {
             <span>Wishlist</span>
           </Link>
 
+          {/* My Bookings (Logged In Users) */}
+          {user && (
+            <Link
+              to="/my-bookings"
+              className="
+                flex items-center gap-1.5
+                hover:text-rose-500
+                transition-colors
+                cursor-pointer
+                whitespace-nowrap
+              "
+            >
+              <Calendar className="w-4 h-4 text-rose-500" />
+              <span>My Bookings</span>
+            </Link>
+          )}
+
           {/* User */}
           {user ? (
             <div className="flex items-center gap-4">
@@ -276,6 +293,28 @@ const Navbar = () => {
             <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
             <span>Wishlist</span>
           </Link>
+
+          {/* My Bookings in Mobile Menu */}
+          {user && (
+            <Link
+              to="/my-bookings"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="
+                flex items-center gap-2
+                w-full
+                text-left
+                py-2
+                text-sm
+                font-medium
+                text-gray-700
+                hover:text-rose-500
+                transition
+              "
+            >
+              <Calendar className="w-4 h-4 text-rose-500" />
+              <span>My Bookings</span>
+            </Link>
+          )}
 
           {user ? (
             <>

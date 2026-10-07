@@ -3,6 +3,7 @@ import {
   createCheckoutSession,
   confirmPayment,
   getBookedDates,
+  getUserBookings,
 } from "../controllers/bookingController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -14,5 +15,6 @@ router.get("/listing/:listingId/booked-dates", getBookedDates);
 // Protected: Checkout & Payment Confirmation
 router.post("/create-checkout-session", protect, createCheckoutSession);
 router.post("/confirm-payment", protect, confirmPayment);
+router.get("/my-bookings", protect, getUserBookings);
 
 export default router;

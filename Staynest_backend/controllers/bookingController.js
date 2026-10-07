@@ -144,3 +144,21 @@ export const confirmPayment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Fetch all paid bookings for the logged-in user
+export const getUserBookings = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const bookings = await Booking.find({
+      user: userId,
+      paymentStatus: "paid",
+    })
+      .populate("listing")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(bookings);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

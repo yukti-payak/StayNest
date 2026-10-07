@@ -9,6 +9,7 @@ import Signup from './pages/Signup.jsx';
 import EditListing from './pages/EditListing.jsx';
 import BookingSuccess from "./pages/BookingSuccess.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
+import MyBookings from "./pages/MyBooking.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/listings/new" element={<NewListing />} />
           <Route path="/listings/:id/edit" element={<EditListing />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
 
           {/* Auth Routes */}
           <Route path="/booking/success" element={<BookingSuccess />} />
