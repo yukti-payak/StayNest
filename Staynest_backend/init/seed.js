@@ -20,17 +20,24 @@ const initDB = async () => {
     await Listing.deleteMany({});
 
     // 3. Extract array if exported as { data: [...] } or array directly
-    const dataToInsert = Array.isArray(sampleListings) 
+    const rawData = Array.isArray(sampleListings) 
       ? sampleListings 
       : sampleListings.data;
 
-    // 4. Seed database
+    // 4. Map through the data and inject the required owner field
+    const dataToInsert = rawData.map((obj) => ({
+      ...obj,
+      // ⚠️ REPLACE THIS STRING WITH A VALID USER ID FROM YOUR ATLAS USERS COLLECTION
+      owner: "65c2b8f8e4b0a1b2c3d4e5f6", 
+    }));
+
+    // 5. Seed database
     await Listing.insertMany(dataToInsert);
     console.log("Database initialized with sample listings!");
   } catch (err) {
     console.error("Error seeding the database:", err);
   } finally {
-    // 5. Safely close connection when complete
+    // 6. Safely close connection when complete
     await mongoose.connection.close();
     console.log("Disconnected from DB.");
   }

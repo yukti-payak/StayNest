@@ -63,6 +63,15 @@ const listingSchema = new Schema(
       },
     },
 
+    houseManual: {
+      wifiName: { type: String, default: "" },
+      wifiPassword: { type: String, default: "" },
+      checkInInstructions: { type: String, default: "" },
+      applianceRules: { type: String, default: "" },
+      trashDisposal: { type: String, default: "" },
+      parkingInfo: { type: String, default: "" },
+    },
+
     reviews: [
       {
         type: Schema.Types.ObjectId,
