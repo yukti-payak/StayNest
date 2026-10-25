@@ -4,7 +4,7 @@ import Listing from "../models/Listing.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// 1. Fetch Booked Dates for UI Calendar
+
 export const getBookedDates = async (req, res) => {
   try {
     const { listingId } = req.params;
@@ -29,12 +29,12 @@ export const getBookedDates = async (req, res) => {
   }
 };
 
-// 2. Create Stripe Checkout Session
+
 export const createCheckoutSession = async (req, res) => {
   try {
     const { listingId, checkIn, checkOut } = req.body;
     
-    // 1. Ensure origin always has an explicit scheme (e.g. http://)
+    
     const origin = process.env.FRONTEND_URL || "http://localhost:5173";
     const userId = req.user._id;
 
@@ -48,7 +48,7 @@ export const createCheckoutSession = async (req, res) => {
     const listing = await Listing.findById(listingId);
     if (!listing) return res.status(404).json({ message: "Listing not found" });
 
-    // Check overlapping bookings
+    
     const overlappingBooking = await Booking.findOne({
       listing: listingId,
       paymentStatus: "paid",
@@ -72,7 +72,7 @@ export const createCheckoutSession = async (req, res) => {
         ? listing.image.url
         : "https://images.unsplash.com/photo-1566073771259-6a8506099945";
 
-    // Create Stripe Session
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -91,12 +91,12 @@ export const createCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      // 3. Use origin instead of raw process.env.FRONTEND_URL
+      
       success_url: `${origin}/booking/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/listings/${listingId}`,
     });
 
-    // Save pending booking
+    
     await Booking.create({
       listing: listingId,
       user: userId,
@@ -114,7 +114,7 @@ export const createCheckoutSession = async (req, res) => {
   }
 };
 
-// 3. Confirm Payment After Redirect
+
 export const confirmPayment = async (req, res) => {
   try {
     const { sessionId } = req.body;
@@ -145,7 +145,7 @@ export const confirmPayment = async (req, res) => {
   }
 };
 
-// Fetch all paid bookings for the logged-in user
+
 export const getUserBookings = async (req, res) => {
   try {
     const userId = req.user._id;

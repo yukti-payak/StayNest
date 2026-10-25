@@ -2,12 +2,11 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
 
-// Common cookie configuration options
 const cookieOptions = {
   httpOnly: true,
-  secure: false, // Set to true in production with HTTPS
-  sameSite: "lax", // Crucial for cross-port requests (e.g., 5173 to 8080)
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  secure: false, 
+  sameSite: "lax", 
+  maxAge: 24 * 60 * 60 * 1000, 
 };
 
 export const register = async (req, res) => {
@@ -39,7 +38,7 @@ export const register = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token, // Returning token for flexible frontend storage
+      token, 
     });
   } catch (error) {
     res.status(500).json({
@@ -76,7 +75,7 @@ export const login = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token, // Returning token for flexible frontend storage
+      token, 
     });
   } catch (error) {
     res.status(500).json({
