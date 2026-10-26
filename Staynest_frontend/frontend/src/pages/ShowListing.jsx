@@ -9,7 +9,6 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
   AlertCircle,
-  MapPin,
   Star,
   Trash2,
   Edit,
@@ -318,7 +317,7 @@ const ShowListing = () => {
 
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 py-6 w-full">
         {/* Title Header with Host Actions */}
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="mb-5 flex items-center justify-between gap-4">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             {listing.title}
           </h1>
@@ -346,9 +345,9 @@ const ShowListing = () => {
 
         {/* 2-Column Main Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 items-start">
-          {/* Left Column: Container for Image & Description */}
-          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-xs">
-            <div className="w-full h-[300px] sm:h-[360px] overflow-hidden bg-gray-100 relative">
+          {/* Left Column: Unified Container for Single Image & Description */}
+          <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+            <div className="w-full h-[320px] sm:h-[380px] bg-gray-100 flex items-center justify-center overflow-hidden">
               <img
                 src={imageUrl}
                 alt={listing.title}
@@ -357,26 +356,26 @@ const ShowListing = () => {
               />
             </div>
 
-            <div className="p-4 sm:p-5 space-y-4">
-              <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className="pb-4 border-b border-gray-100 flex items-center justify-between">
                 <div>
                   <h2 className="text-base font-bold text-gray-900">
                     Stay hosted by {ownerName}
                   </h2>
-                  <p className="text-[11px] text-gray-500 font-medium">
+                  <p className="text-xs text-gray-500 font-medium">
                     {listing.location}, {listing.country}
                   </p>
                 </div>
-                <div className="w-9 h-9 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0">
+                <div className="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                   {ownerName.charAt(0).toUpperCase()}
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-bold text-gray-900 mb-1.5">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">
                   About this space
                 </h3>
-                <p className="text-gray-600 leading-relaxed text-xs whitespace-pre-line">
+                <p className="text-gray-600 leading-relaxed text-xs sm:text-sm whitespace-pre-line">
                   {listing.description}
                 </p>
               </div>
@@ -386,7 +385,7 @@ const ShowListing = () => {
           {/* Right Column: Reservation Card */}
           <div className="lg:col-span-1 sticky top-20">
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-lg">
-              {/* Header Price Section */}
+              {/* Price Header */}
               <div className="flex items-baseline justify-between mb-4">
                 <div>
                   <span className="text-2xl font-black text-gray-900">
@@ -414,10 +413,9 @@ const ShowListing = () => {
                 </div>
               )}
 
-              {/* Date Selection Grid */}
+              {/* Date Selection Box */}
               <div className="border border-gray-300 rounded-xl overflow-hidden mb-4 focus-within:ring-2 focus-within:ring-rose-500 transition-all bg-white">
                 <div className="grid grid-cols-2 divide-x divide-gray-200">
-                  {/* Check-In */}
                   <div className="p-2.5">
                     <label className="block text-[9px] font-bold uppercase text-gray-500 tracking-wider mb-0.5 flex items-center gap-1">
                       <CalendarIcon className="w-2.5 h-2.5 text-rose-500" />
@@ -441,7 +439,6 @@ const ShowListing = () => {
                     />
                   </div>
 
-                  {/* Check-Out */}
                   <div className="p-2.5">
                     <label className="block text-[9px] font-bold uppercase text-gray-500 tracking-wider mb-0.5 flex items-center gap-1">
                       <CalendarIcon className="w-2.5 h-2.5 text-rose-500" />
@@ -515,7 +512,7 @@ const ShowListing = () => {
           </div>
         </div>
 
-        {/* Compact Map Section */}
+        {/* Map Section */}
         <div className="mb-8 border-t border-gray-200 pt-5">
           <div className="mb-2.5">
             <h3 className="text-base font-bold text-gray-900">Where you'll be</h3>
@@ -605,7 +602,7 @@ const ShowListing = () => {
             </div>
           )}
 
-          {/* Comments Section */}
+          {/* Comments List */}
           {listing.reviews && listing.reviews.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl">
               {listing.reviews.map((rev) => {
@@ -671,12 +668,14 @@ const ShowListing = () => {
         </div>
       </main>
 
+      <Footer />
+
       {/* Fullscreen Image View Modal */}
       {showGalleryModal && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
           <button
             onClick={() => setShowGalleryModal(false)}
-            className="absolute top-5 right-5 text-white hover:text-gray-300 p-2 bg-white/10 rounded-full"
+            className="absolute top-5 right-5 text-white hover:text-gray-300 p-2 bg-white/10 rounded-full cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
