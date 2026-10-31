@@ -668,7 +668,6 @@ const ShowListing = () => {
         </div>
       </main>
 
-      <Footer />
 
       {/* Fullscreen Image View Modal */}
       {showGalleryModal && (
