@@ -37,7 +37,7 @@ const listingSchema = new Schema(
 
          category: {
     type: String,
-    required: true, // you can make this optional if needed
+    // required: true, // you can make this optional if needed
     enum: [
       "Trending",
       "Rooms",

@@ -30,7 +30,7 @@ const initDB = async () => {
     }
 
     // 4. Map data and ensure a valid ObjectId is assigned to 'owner'
-    const defaultOwnerId = new mongoose.Types.ObjectId("65c2b8f8e4b0a1b2c3d4e5f6");
+    const defaultOwnerId = new mongoose.Types.ObjectId("6aea07652ef122e1fd1913e2");
 
     const dataToInsert = rawData.map((obj) => ({
       ...obj,

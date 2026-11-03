@@ -47,6 +47,7 @@ export const getAllListings = async (req, res) => {
         { country: regex },
       ];
     }
+    console.log("filter",filter)
 
     const listings = await Listing.find(filter)
       .populate("owner", "name email")
@@ -70,10 +71,45 @@ export const getAllListings = async (req, res) => {
   }
 };
 
+
+// export const getListingById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+// console.log(id)
+//     const listing = await Listing.findById(id)
+//     console.log(listing)
+//       .populate("owner", "name email")
+//       .populate({
+//         path: "reviews",
+//         populate: {
+//           path: "author",
+//           select: "name",
+//         },
+//       });
+
+//     if (!listing) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Listing not found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       data: listing,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 // 2. Get Single Listing by ID
 export const getListingById = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Requested Listing ID:", id);
 
     const listing = await Listing.findById(id)
       .populate("owner", "name email")
@@ -84,6 +120,8 @@ export const getListingById = async (req, res) => {
           select: "name",
         },
       });
+
+    console.log("Found Listing:", listing);
 
     if (!listing) {
       return res.status(404).json({
@@ -103,7 +141,6 @@ export const getListingById = async (req, res) => {
     });
   }
 };
-
 // 3. Create New Listing (with Mapbox Geocoding)
 export const createListing = async (req, res) => {
   try {
