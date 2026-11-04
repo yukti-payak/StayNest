@@ -20,65 +20,54 @@ const socials = [
   },
 ];
 
+const linkClass =
+  "inline-block text-gray-600 hover:text-rose-600 transition-colors focus-visible:outline-none focus-visible:underline";
+
 const Footer = () => {
   return (
     <footer className="bg-gray-50 text-gray-600 text-sm mt-auto border-t border-gray-200 relative z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Top: brand + quick links */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
-          <div className="space-y-3 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="space-y-3">
+            <Link to="/" className="inline-flex items-center gap-2" aria-label="StayNest home">
+              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-rose-500 text-white shadow-sm shadow-rose-200">
                 <Compass className="w-5 h-5" />
               </span>
               <span className="font-bold text-gray-900 text-xl tracking-tight">StayNest</span>
-            </div>
-            <p className="text-sm text-gray-500 max-w-sm mx-auto sm:mx-0">
-              Discover and book unique stay listings around the world with ease.
+            </Link>
+            <p className="text-gray-500 max-w-sm leading-relaxed">
+              Find and book unique stays around the world, from beach houses to mountain cabins.
             </p>
           </div>
 
-          <nav aria-label="Explore" className="text-center sm:text-left">
+          <nav aria-label="Explore">
             <h4 className="font-semibold text-gray-900 mb-3">Explore</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="hover:text-rose-500 transition-colors">All stays</Link>
-              </li>
-              <li>
-                <Link to="/wishlist" className="hover:text-rose-500 transition-colors">Wishlist</Link>
-              </li>
-              <li>
-                <Link to="/my-bookings" className="hover:text-rose-500 transition-colors">My bookings</Link>
-              </li>
+            <ul className="space-y-2.5">
+              <li><Link to="/" className={linkClass}>All stays</Link></li>
+              <li><Link to="/wishlist" className={linkClass}>Wishlist</Link></li>
+              <li><Link to="/my-bookings" className={linkClass}>My bookings</Link></li>
             </ul>
           </nav>
 
-          <nav aria-label="Hosting" className="text-center sm:text-left">
+          <nav aria-label="Hosting">
             <h4 className="font-semibold text-gray-900 mb-3">Hosting</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/listings/new" className="hover:text-rose-500 transition-colors">Add a listing</Link>
-              </li>
-              <li>
-                <Link to="/login" className="hover:text-rose-500 transition-colors">Log in</Link>
-              </li>
-              <li>
-                <Link to="/signup" className="hover:text-rose-500 transition-colors">Sign up</Link>
-              </li>
+            <ul className="space-y-2.5">
+              <li><Link to="/listings/new" className={linkClass}>Add a listing</Link></li>
+              <li><Link to="/login" className={linkClass}>Log in</Link></li>
+              <li><Link to="/signup" className={linkClass}>Sign up</Link></li>
             </ul>
           </nav>
         </div>
 
-        {/* Bottom: copyright + socials */}
-        <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+          <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <span className="font-semibold text-gray-800">StayNest, Inc.</span>
             <span>&copy; {new Date().getFullYear()}</span>
-            <span aria-hidden="true">•</span>
-            <span className="flex items-center gap-1">
+            <span className="inline-flex items-center gap-1">
               Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> for travelers
             </span>
-          </div>
+          </p>
 
           <div className="flex items-center gap-2.5">
             {socials.map((s) => (
@@ -88,7 +77,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 transition-all hover:text-rose-500 hover:border-rose-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 transition hover:text-rose-600 hover:border-rose-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d={s.path} />

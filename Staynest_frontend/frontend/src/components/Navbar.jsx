@@ -23,6 +23,9 @@ const mobileLink = ({ isActive }) =>
     isActive ? "bg-rose-50 text-rose-600" : "text-gray-700 hover:bg-gray-50"
   }`;
 
+const menuItem =
+  "flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors";
+
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -37,7 +40,6 @@ const Navbar = () => {
     setSearchTerm(searchParams.get("query") || "");
   }, [searchParams]);
 
-  // Shadow appears only after scrolling
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
     onScroll();
@@ -45,7 +47,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close user dropdown on outside click / Escape
   useEffect(() => {
     const onClick = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -87,6 +88,7 @@ const Navbar = () => {
       queryParams.delete("query");
     }
     navigate(`/?${queryParams.toString()}`);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -95,30 +97,30 @@ const Navbar = () => {
         scrolled ? "border-gray-200 shadow-sm" : "border-gray-100"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-5">
-        {/* LOGO */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-0 md:h-20 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-3 gap-y-2 sm:gap-x-5">
+        {/* Logo */}
         <Link to="/" className="flex items-center shrink-0" aria-label="StayNest home">
           <img
             src="/logo.png"
-            alt="StayNest Logo"
+            alt="StayNest"
             className="h-10 sm:h-12 w-auto object-contain max-w-[160px] sm:max-w-[200px]"
           />
         </Link>
 
-        {/* SEARCH */}
+        {/* Search: full-width second row on mobile */}
         <form
           onSubmit={handleSearch}
           role="search"
-          className="flex-1 max-w-[520px] min-w-0"
+          className="order-last md:order-none w-full md:w-auto md:flex-1 md:max-w-[520px] min-w-0"
         >
-          <div className="flex items-center w-full h-11 sm:h-12 bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md focus-within:border-rose-400 focus-within:ring-4 focus-within:ring-rose-100">
+          <div className="flex items-center w-full h-11 md:h-12 bg-white border border-gray-300 rounded-full shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md focus-within:border-rose-400 focus-within:ring-4 focus-within:ring-rose-100">
             <input
               type="text"
-              placeholder="Search destinations, title, location..."
+              placeholder="Search destinations, title, location…"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               aria-label="Search listings"
-              className="flex-1 min-w-0 h-full pl-4 sm:pl-5 pr-2 text-sm text-gray-800 placeholder-gray-400 bg-transparent outline-none"
+              className="flex-1 min-w-0 h-full pl-4 md:pl-5 pr-2 text-sm text-gray-800 placeholder-gray-400 bg-transparent outline-none"
             />
 
             {searchTerm && (
@@ -135,14 +137,14 @@ const Navbar = () => {
             <button
               type="submit"
               aria-label="Search"
-              className="flex items-center justify-center shrink-0 h-9 w-9 sm:h-10 sm:w-10 mr-1 rounded-full bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:ring-offset-2"
+              className="flex items-center justify-center shrink-0 h-9 w-9 md:h-10 md:w-10 mr-1 rounded-full bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:ring-offset-2"
             >
-              <Search className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+              <Search className="w-4 h-4 md:w-[18px] md:h-[18px]" />
             </button>
           </div>
         </form>
 
-        {/* DESKTOP NAV */}
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1 shrink-0" aria-label="Primary">
           <NavLink to="/listings/new" className={desktopLink}>
             <Plus className="w-4 h-4" />
@@ -157,7 +159,7 @@ const Navbar = () => {
           {user && (
             <NavLink to="/my-bookings" className={desktopLink}>
               <Calendar className="w-4 h-4 text-rose-500" />
-              <span>My Bookings</span>
+              <span>My bookings</span>
             </NavLink>
           )}
 
@@ -185,20 +187,42 @@ const Navbar = () => {
               {isUserMenuOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 origin-top-right"
+                  className="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 origin-top-right"
                 >
-                  <div className="px-4 py-2 border-b border-gray-100">
+                  <div className="px-4 py-2 border-b border-gray-100 mb-1">
                     <p className="text-xs text-gray-500">Signed in as</p>
                     <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
                   </div>
-                  <button
+
+                  <Link
+                    to="/my-bookings"
                     role="menuitem"
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className={menuItem}
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>Log out</span>
-                  </button>
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    My bookings
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    role="menuitem"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className={menuItem}
+                  >
+                    <Heart className="w-4 h-4 text-gray-500" />
+                    Wishlist
+                  </Link>
+
+                  <div className="border-t border-gray-100 mt-1 pt-1">
+                    <button
+                      role="menuitem"
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Log out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -220,7 +244,7 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* MOBILE BUTTON */}
+        {/* Mobile menu button */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMobileMenuOpen((v) => !v)}
@@ -233,7 +257,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 pt-3 pb-4 space-y-1 shadow-lg">
           {user && (
@@ -250,7 +274,7 @@ const Navbar = () => {
 
           <NavLink to="/listings/new" onClick={() => setIsMobileMenuOpen(false)} className={mobileLink}>
             <Plus className="w-4 h-4" />
-            <span>Add new listing</span>
+            <span>Add listing</span>
           </NavLink>
 
           <NavLink to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className={mobileLink}>
@@ -261,7 +285,7 @@ const Navbar = () => {
           {user && (
             <NavLink to="/my-bookings" onClick={() => setIsMobileMenuOpen(false)} className={mobileLink}>
               <Calendar className="w-4 h-4 text-rose-500" />
-              <span>My Bookings</span>
+              <span>My bookings</span>
             </NavLink>
           )}
 
