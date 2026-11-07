@@ -1,6 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Compass, Heart } from "lucide-react";
+import { Compass, Heart, ShieldCheck, CalendarCheck, Headphones, Mail, MapPin } from "lucide-react";
 
 const socials = [
   {
@@ -20,52 +19,78 @@ const socials = [
   },
 ];
 
-const linkClass =
-  "inline-block text-gray-600 hover:text-rose-600 transition-colors focus-visible:outline-none focus-visible:underline";
+// Plain, non-clickable highlights (no duplicates of navbar links)
+const highlights = [
+  {
+    icon: ShieldCheck,
+    title: "Verified stays",
+    text: "Every listing is reviewed before it goes live.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Easy booking",
+    text: "Pick your dates and confirm in a few steps.",
+  },
+  {
+    icon: Headphones,
+    title: "Help when you need it",
+    text: "Our team is available around the clock.",
+  },
+];
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 text-gray-600 text-sm mt-auto border-t border-gray-200 relative z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr]">
+    <footer className="relative z-10 mt-auto border-t border-gray-200 bg-gradient-to-b from-gray-50 to-white text-sm text-gray-600">
+      <div className="mx-auto max-w-7xl px-4 pb-8 pt-12 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_1.9fr] lg:gap-16">
           {/* Brand */}
-          <div className="space-y-3">
-            <Link to="/" className="inline-flex items-center gap-2" aria-label="StayNest home">
-              <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-rose-500 text-white shadow-sm shadow-rose-200">
-                <Compass className="w-5 h-5" />
+          <div className="space-y-5">
+            <div className="inline-flex items-center gap-2.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500 text-white shadow-md shadow-rose-200">
+                <Compass className="h-5 w-5" />
               </span>
-              <span className="font-bold text-gray-900 text-xl tracking-tight">StayNest</span>
-            </Link>
-            <p className="text-gray-500 max-w-sm leading-relaxed">
+              <span className="text-xl font-bold tracking-tight text-gray-900">StayNest</span>
+            </div>
+
+            <p className="max-w-sm leading-relaxed text-gray-500">
               Find and book unique stays around the world, from beach houses to mountain cabins.
             </p>
+
+            <ul className="space-y-2 text-gray-500">
+              <li className="flex items-center gap-2.5">
+                <MapPin className="h-4 w-4 shrink-0 text-rose-500" />
+                <span>Hosts and travelers in 50+ countries</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 shrink-0 text-rose-500" />
+                <span>support@staynest.com</span>
+              </li>
+            </ul>
           </div>
 
-          <nav aria-label="Explore">
-            <h4 className="font-semibold text-gray-900 mb-3">Explore</h4>
-            <ul className="space-y-2.5">
-              <li><Link to="/" className={linkClass}>All stays</Link></li>
-              <li><Link to="/wishlist" className={linkClass}>Wishlist</Link></li>
-              <li><Link to="/my-bookings" className={linkClass}>My bookings</Link></li>
-            </ul>
-          </nav>
-
-          <nav aria-label="Hosting">
-            <h4 className="font-semibold text-gray-900 mb-3">Hosting</h4>
-            <ul className="space-y-2.5">
-              <li><Link to="/listings/new" className={linkClass}>Add a listing</Link></li>
-              <li><Link to="/login" className={linkClass}>Log in</Link></li>
-              <li><Link to="/signup" className={linkClass}>Sign up</Link></li>
-            </ul>
-          </nav>
+          {/* Highlights */}
+          <div className="grid gap-8 sm:grid-cols-3">
+            {highlights.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="flex gap-3.5 sm:flex-col sm:gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-500 ring-1 ring-rose-100">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{title}</h4>
+                  <p className="mt-1 leading-relaxed text-gray-500">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 text-xs text-gray-500 sm:flex-row">
           <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <span className="font-semibold text-gray-800">StayNest, Inc.</span>
             <span>&copy; {new Date().getFullYear()}</span>
             <span className="inline-flex items-center gap-1">
-              Made with <Heart className="w-3 h-3 text-rose-500 fill-rose-500" /> for travelers
+              Made with <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> for travelers
             </span>
           </p>
 
@@ -77,9 +102,9 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="p-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 transition hover:text-rose-600 hover:border-rose-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                className="rounded-xl border border-gray-200 bg-white p-2.5 text-gray-600 transition hover:-translate-y-0.5 hover:border-rose-300 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
               >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                   <path d={s.path} />
                 </svg>
               </a>
